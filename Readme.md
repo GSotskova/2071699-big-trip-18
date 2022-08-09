@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
-* Студент: [Галина Соцкова](https://up.htmlacademy.ru/ecmascript/18/user/2071699).
-* Наставник: `Неизвестно`.
+* Студент: [Галина Соцкова](https://htmlacademy.ru/profile/id2071699).
+* Наставник: [Михаил Савотиков] (https://htmlacademy.ru/profile/id98316).
 
 ---
 
