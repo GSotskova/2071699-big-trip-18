@@ -3,12 +3,12 @@ import {POINT_COUNT} from '../const.js';
 
 
 export default class PointsModel {
-  points = Array.from({length: POINT_COUNT}, (v,i)=>generatePoint(i));
+  points = Array.from({length: POINT_COUNT}, (v,i)=>generatePoint(i + 1));
   getPoints = () => this.points;
 
-  destinations = Array.from({length: POINT_COUNT}, (v,i)=>generateDestination(i));
+  destinations = Array.from({length: POINT_COUNT}, (v,i)=>generateDestination(i + 1));
   getDestinations = () => this.destinations;
 
-  offers = Array.from({length: POINT_COUNT}, (v,i)=>generateOffer(i));
+  offers = Array.from({length: POINT_COUNT}, (v,i)=>generateOffer(i + 1));
   getOffers = () => this.offers;
 }
