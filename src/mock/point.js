@@ -1,5 +1,5 @@
-import {getRandomInteger,getRandomNumber} from '../utils.js';
-import {DESCRIPTIONS,TYPES,CITIES} from '../const.js';
+import {getRandomInteger, getRandomNumber} from '../utils.js';
+import {DESCRIPTIONS, TYPES, CITIES} from '../constants.js';
 import dayjs from 'dayjs';
 
 const generateType = () => {
@@ -18,19 +18,19 @@ const generateCity = () => {
 
 //генерация даты начала и даты окончания
 const generateDate = () => {
-  const dayGap = getRandomInteger(0, 31);
+  const dayGap = getRandomInteger(1, 31);
   const hourGap = getRandomNumber(1, 24);
   const minGap = getRandomNumber(1, 60);
   //в кач-ве даты начала берем текущую дату плюс случайное кол-во дней, плюс случ кол-во часов и минут
-  const datePointFrom = dayjs().add(dayGap, 'day').add(hourGap, 'hour').add(minGap,'minute');
+  const datePointFrom = dayjs().add(dayGap, 'day').add(hourGap, 'hour').add(minGap, 'minute');
   //в кач-ве даты окончания берем полученную выше даты начала плюс случ кол-во часов и минут
-  const datePointTo = datePointFrom.add(hourGap, 'hour').add(minGap,'minute');
+  const datePointTo = datePointFrom.add(hourGap, 'hour').add(minGap, 'minute');
 
   return {datePointFrom, datePointTo} ;
 };
 
 
-const generateDestination = (i) => ({
+export const generateDestination = (i) => ({
   id: i, //идентификато начитываем при создании массивы array.from - просто порядковый номер
   description: generateDescription(),
   name:  generateCity(),
@@ -44,7 +44,7 @@ const generateDestination = (i) => ({
 });
 
 
-const generateOffer = (i) => ({
+export const generateOffer = (i) => ({
   id:i,
   type: TYPES[i - 1],//чтобы не было задвоение берем значения из массива по порядку
   title: 'Upgrade to a business class',
@@ -52,9 +52,9 @@ const generateOffer = (i) => ({
 });
 
 
-const generatePoint = (i) => {
-  const randomNumber = getRandomInteger(0,5);
-  const OFFERS = new Set(Array.from({length: randomNumber},()=> getRandomInteger(0,10))); //формируем массив с уникальными значениями
+export const generatePoint = (i) => {
+  const randomNumber = getRandomInteger(0, 5);
+  const OFFERS = new Set(Array.from({length: randomNumber},()=> getRandomInteger(0, 10))); //формируем массив с уникальными значениями
   const datePoint = generateDate();
   return {
     price: getRandomInteger(100, 500),
@@ -68,4 +68,3 @@ const generatePoint = (i) => {
   };
 };
 
-export {generateDestination,generateOffer, generatePoint};

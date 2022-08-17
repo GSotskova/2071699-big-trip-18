@@ -15,4 +15,4 @@ const routePresenter = new RoutePresenter();
 
 render(new FilterView(), siteTripFiltersElement);
 render(new SortView(), siteBodyContainerElement);
-routePresenter.init(siteBodyContainerElement,pointsModel);
+routePresenter.init(siteBodyContainerElement, pointsModel);

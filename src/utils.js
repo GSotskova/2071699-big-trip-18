@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 // Функция из интернета по генерации случайного числа из диапазона
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
-const getRandomInteger = (a = 0, b = 1) => {
+export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
 
@@ -9,9 +9,9 @@ const getRandomInteger = (a = 0, b = 1) => {
 };
 
 
-const getRandomNumber = (min, max) => Math.round((Math.random() * (max - min ) + min) * 10) / 10;
+export const getRandomNumber = (min, max) => Math.round((Math.random() * (max - min ) + min) * 10) / 10;
 
-const getdateDiff = (date1, date2) => {
+export const getdateDiff = (date1, date2) => {
   const dateFrom = dayjs(date1);
   const dateTo = dayjs(date2);
 
@@ -28,5 +28,3 @@ const getdateDiff = (date1, date2) => {
 
   return `${strDay} ${strHour} ${strMin}`;
 };
-
-export {getRandomInteger,getRandomNumber,getdateDiff};

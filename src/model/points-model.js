@@ -1,5 +1,5 @@
-import {generatePoint,generateDestination,generateOffer} from '../mock/point.js';
-import {POINT_COUNT} from '../const.js';
+import {generatePoint, generateDestination, generateOffer} from '../mock/point.js';
+import {POINT_COUNT} from '../constants.js';
 
 
 export default class PointsModel {
