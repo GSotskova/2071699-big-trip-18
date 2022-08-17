@@ -27,7 +27,7 @@ export default class RoutePresenter {
 
       const destination = this.routeDestinations.find((el) => el.id === this.routePoints[i].destination);
 
-      const pointOffers = this.routeOffers.filter((el) => this.routePoints[i].offers.includes(el.id) );
+      const pointOffers = this.routeOffers.filter((el) => this.routePoints[i].offers.includes(el.id));
       const pointTypeOffer = [];
       pointOffers.forEach((el) => pointTypeOffer.push(el));
       const pointIdOffer = [];
