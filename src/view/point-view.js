@@ -25,7 +25,9 @@ const createPointTemplate = (point, destination, selectedOffers) => {
 
   let offerTemplate = '';
 
-  selectedOffers.forEach((el) => {offerTemplate += createOfferTemplate(el);});
+  selectedOffers.forEach((el) => {
+    offerTemplate += createOfferTemplate(el);
+  });
 
   return (
     `<li class="trip-events__item">

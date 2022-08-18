@@ -6,7 +6,9 @@ const createOfferEditTemplate = (offer, selectedOffers) => {
   const {id, type, price} = offer;
   let isChecked = '';
 
-  if (selectedOffers.includes(id) ) {isChecked = 'checked';}
+  if (selectedOffers.includes(id)) {
+    isChecked = 'checked';
+  }
 
   return (
     `<div class="event__offer-selector">
@@ -37,7 +39,9 @@ const createEditPointTemplate = (point, destination, allOffers, selectedOffers) 
   const date2 = dayjs(dateTo).format('DD/MM/YY HH:mm');
 
   let offerEditTemplate = '';
-  allOffers.forEach((el) => {offerEditTemplate += createOfferEditTemplate(el, selectedOffers);});
+  allOffers.forEach((el) => {
+    offerEditTemplate += createOfferEditTemplate(el, selectedOffers);
+  });
 
   const photoDestination = createPhotoTemplate(pictures[0].src);
 
