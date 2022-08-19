@@ -54,7 +54,7 @@ export const generateOffer = (i) => ({
 
 export const generatePoint = (i) => {
   const randomNumber = getRandomInteger(0, 5);
-  const OFFERS = new Set(Array.from({length: randomNumber},()=> getRandomInteger(0, 10))); //формируем массив с уникальными значениями
+  const OFFERS = new Set(Array.from({length: randomNumber},() => getRandomInteger(1, TYPES.length))); //формируем массив с уникальными значениями
   const datePoint = generateDate();
   return {
     price: getRandomInteger(100, 500),
