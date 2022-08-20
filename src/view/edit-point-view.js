@@ -6,10 +6,9 @@ const createOfferEditTemplate = (offer, selectedOffers) => {
   const {id, type, price} = offer;
   let isChecked = '';
 
-  const pointIdOffer = [];
-  selectedOffers.forEach((el) => pointIdOffer.push(el.id));
+  const selectedOffersIds = selectedOffers.map((el) => el.id);
 
-  if (pointIdOffer.includes(id)) {
+  if (selectedOffersIds.includes(id)) {
     isChecked = 'checked';
   }
 
@@ -49,7 +48,8 @@ const createEditPointTemplate = (point, destination, allOffers, selectedOffers) 
   const photoDestination = createPhotoTemplate(pictures[0].src);
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+      <form class="event event--edit" action="#" method="post">
        <header class="event__header">
          <div class="event__type-wrapper">
            <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -159,7 +159,8 @@ const createEditPointTemplate = (point, destination, allOffers, selectedOffers) 
          </section>
        </section>
        ${photoDestination}
-     </form>`
+     </form>
+    </li>`
   );
 };
 

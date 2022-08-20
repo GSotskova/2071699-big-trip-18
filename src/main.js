@@ -1,5 +1,4 @@
 import FilterView from './view/filter-view.js';
-import SortView from './view/sort-view.js';
 import {render} from './render.js';
 import RoutePresenter from './presenter/route-presenter.js';
 import PointsModel from './model/points-model.js';
@@ -18,5 +17,4 @@ const destinationsModel = new DestinationsModel();
 const routePresenter = new RoutePresenter();
 
 render(new FilterView(), siteTripFiltersElement);
-render(new SortView(), siteBodyContainerElement);
 routePresenter.init(siteBodyContainerElement, pointsModel, offersModel, destinationsModel);

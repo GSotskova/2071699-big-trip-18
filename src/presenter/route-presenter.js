@@ -1,8 +1,12 @@
 import RouteView from '../view/route-view.js';
+import SortView from '../view/sort-view.js';
 import ItemView from '../view/item-view.js';
 import NewPointView from '../view/new-point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 import PointView from '../view/point-view.js';
+import EmptyEverythingView from '../view/empty-everything-view.js';
+import EmptyPastView from '../view/empty-past-view.js';
+import EmptyFutureView from '../view/empty-future-view.js';
 import {render} from '../render.js';
 
 export default class RoutePresenter {
@@ -13,7 +17,6 @@ export default class RoutePresenter {
 
   #routeComponent = new RouteView();
   #itemNewPointComponent = new ItemView();
-  #itemEditPointComponent = new ItemView();
 
   #routePoints = [];
   #routeOffers = [];
@@ -26,20 +29,24 @@ export default class RoutePresenter {
     this.#routePoints = [...this.#pointsModel.points];
     this.#routeOffers = [...this.#offersModel.allOffers];
 
-    render(this.#routeComponent, this.#routeContainer);
 
-    render(this.#itemNewPointComponent, this.#routeComponent.element);
-    render(new NewPointView(), this.#itemNewPointComponent.element);
-
-
-    for (let i = 0; i < this.#routePoints.length; i++) {
-
-      const destination = this.#destinationsModel.getDestinations(this.#routePoints[i]);
-      const pointOffers = [...this.#offersModel.getPointOffer(this.#routePoints[i])];
-
-      this.#renderPoint(this.#routePoints[i], destination, this.#routeOffers, pointOffers);
+    if (this.#routePoints.length === 0) {
+      this.#renderMsgEmpty();
     }
+    else {
+      render(new SortView(), this.#routeContainer);
+      render(this.#routeComponent, this.#routeContainer);
+      render(this.#itemNewPointComponent, this.#routeComponent.element);
+      render(new NewPointView(), this.#itemNewPointComponent.element);
 
+      for (let i = 0; i < this.#routePoints.length; i++) {
+
+        const destination = this.#destinationsModel.getDestinations(this.#routePoints[i]);
+        const pointOffers = [...this.#offersModel.getPointOffer(this.#routePoints[i])];
+
+        this.#renderPoint(this.#routePoints[i], destination, this.#routeOffers, pointOffers);
+      }
+    }
   };
 
   #renderPoint = (point, destination, allOffers, pointOffers) => {
@@ -81,5 +88,33 @@ export default class RoutePresenter {
 
     render(pointComponent, this.#routeComponent.element);
 
+  };
+
+  #renderMsgEmpty = () => {
+    const filterRadioElements = document.querySelectorAll('.trip-filters__filter-input');
+    const withoutPointComponent = new EmptyEverythingView();
+    const withoutPointPastComponent = new EmptyPastView();
+    const withoutPointFutureComponent = new EmptyFutureView();
+
+    render(withoutPointComponent, this.#routeContainer);//изначально выводим сообщение для всех точек маршрута
+
+    //в зависимости от выбранного фильтра меняем сообщение
+    const onReplaceMsgOfEmpty = (evt) => {
+      this.#routeContainer.querySelector('.trip-events__msg').remove();
+      switch (evt.target.value) {
+        case 'everything':
+          render(withoutPointComponent, this.#routeContainer);
+          break;
+        case 'future':
+          render(withoutPointPastComponent, this.#routeContainer);
+          break;
+        case 'past':
+          render(withoutPointFutureComponent, this.#routeContainer);
+          break;
+      }
+
+    };
+
+    filterRadioElements.forEach((el) => el.addEventListener('change', onReplaceMsgOfEmpty));
   };
 }
