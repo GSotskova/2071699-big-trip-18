@@ -6,7 +6,10 @@ const createOfferEditTemplate = (offer, selectedOffers) => {
   const {id, type, price} = offer;
   let isChecked = '';
 
-  if (selectedOffers.includes(id)) {
+  const pointIdOffer = [];
+  selectedOffers.forEach((el) => pointIdOffer.push(el.id));
+
+  if (pointIdOffer.includes(id)) {
     isChecked = 'checked';
   }
 
@@ -162,27 +165,33 @@ const createEditPointTemplate = (point, destination, allOffers, selectedOffers) 
 
 
 export default class EditPointView {
+  #point = null;
+  #destination = null;
+  #allOffers = null;
+  #selectedOffers = null;
+  #element = null;
+
   constructor(point, destination, allOffers, selectedOffers) {
-    this.point = point;
-    this.destination = destination;
-    this.allOffers = allOffers;
-    this.selectedOffers = selectedOffers;
+    this.#point = point;
+    this.#destination = destination;
+    this.#allOffers = allOffers;
+    this.#selectedOffers = selectedOffers;
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.destination, this.allOffers, this.selectedOffers);
+  get template() {
+    return createEditPointTemplate(this.#point, this.#destination, this.#allOffers, this.#selectedOffers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
 

@@ -6,43 +6,80 @@ import PointView from '../view/point-view.js';
 import {render} from '../render.js';
 
 export default class RoutePresenter {
-  routeComponent = new RouteView();
-  itemNewPointComponent = new ItemView();
-  itemEditPointComponent = new ItemView();
+  #routeContainer = null;
+  #pointsModel = null;
+  #offersModel = null;
+  #destinationsModel = null;
 
-  init = (routeContainer, pointsModel) => {
-    this.routeContainer = routeContainer;
-    this.pointsModel = pointsModel;
-    this.routeDestinations = [...this.pointsModel.getDestinations()];
-    this.routePoints = [...this.pointsModel.getPoints()];
-    this.routeOffers = [...this.pointsModel.getOffers()];
+  #routeComponent = new RouteView();
+  #itemNewPointComponent = new ItemView();
+  #itemEditPointComponent = new ItemView();
 
-    render(this.routeComponent, this.routeContainer);
+  #routePoints = [];
+  #routeOffers = [];
 
-    render(this.itemNewPointComponent, this.routeComponent.getElement());
-    render(new NewPointView(), this.itemNewPointComponent.getElement());
+  init = (routeContainer, pointsModel, offersModel, destinationsModel) => {
+    this.#routeContainer = routeContainer;
+    this.#pointsModel = pointsModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
+    this.#routePoints = [...this.#pointsModel.points];
+    this.#routeOffers = [...this.#offersModel.allOffers];
+
+    render(this.#routeComponent, this.#routeContainer);
+
+    render(this.#itemNewPointComponent, this.#routeComponent.element);
+    render(new NewPointView(), this.#itemNewPointComponent.element);
 
 
-    for (let i = 0; i < this.routePoints.length; i++) {
+    for (let i = 0; i < this.#routePoints.length; i++) {
 
-      const destination = this.routeDestinations.find((el) => el.id === this.routePoints[i].destination);
+      const destination = this.#destinationsModel.getDestinations(this.#routePoints[i]);
+      const pointOffers = [...this.#offersModel.getPointOffer(this.#routePoints[i])];
 
-      const pointOffers = this.routeOffers.filter((el) => this.routePoints[i].offers.includes(el.id));
-      const pointTypeOffer = [];
-      pointOffers.forEach((el) => pointTypeOffer.push(el));
-      const pointIdOffer = [];
-      pointOffers.forEach((el) => pointIdOffer.push(el.id));
-      if (i === 0) {
-        render(this.itemEditPointComponent, this.routeComponent.getElement());
-        render(
-          new EditPointView(this.routePoints[i], destination, this.routeOffers, pointIdOffer),
-          this.itemEditPointComponent.getElement()
-        );
-      }
-      render(
-        new PointView(this.routePoints[i], destination, pointTypeOffer),
-        this.routeComponent.getElement()
-      );
+      this.#renderPoint(this.#routePoints[i], destination, this.#routeOffers, pointOffers);
     }
+
+  };
+
+  #renderPoint = (point, destination, allOffers, pointOffers) => {
+    const pointComponent = new PointView(point, destination, pointOffers);
+    const pointEditComponent = new EditPointView(point, destination, allOffers, pointOffers);
+
+
+    const replacePontToForm = () => {
+      this.#routeComponent.element.replaceChild(pointEditComponent.element,pointComponent.element);
+    };
+
+    const replaceFormToPoint = () => {
+      this.#routeComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        replaceFormToPoint();
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
+    };
+
+    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replacePontToForm();
+      document.addEventListener('keydown', onEscKeyDown);
+    });
+
+    pointEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replaceFormToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    pointEditComponent.element.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      replaceFormToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    render(pointComponent, this.#routeComponent.element);
+
   };
 }
