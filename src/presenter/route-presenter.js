@@ -32,20 +32,18 @@ export default class RoutePresenter {
 
     if (this.#routePoints.length === 0) {
       this.#renderMsgEmpty();
-    }
-    else {
+    } else {
       render(new SortView(), this.#routeContainer);
       render(this.#routeComponent, this.#routeContainer);
       render(this.#itemNewPointComponent, this.#routeComponent.element);
       render(new NewPointView(), this.#itemNewPointComponent.element);
 
-      for (let i = 0; i < this.#routePoints.length; i++) {
+      this.#routePoints.forEach((point) => {
+        const destination = this.#destinationsModel.getDestinations(point);
+        const pointOffers = [...this.#offersModel.getPointOffer(point)];
 
-        const destination = this.#destinationsModel.getDestinations(this.#routePoints[i]);
-        const pointOffers = [...this.#offersModel.getPointOffer(this.#routePoints[i])];
-
-        this.#renderPoint(this.#routePoints[i], destination, this.#routeOffers, pointOffers);
-      }
+        this.#renderPoint(point, destination, this.#routeOffers, pointOffers);
+      });
     }
   };
 
