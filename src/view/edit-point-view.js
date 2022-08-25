@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 
 
@@ -165,14 +165,15 @@ const createEditPointTemplate = (point, destination, allOffers, selectedOffers) 
 };
 
 
-export default class EditPointView {
+export default class EditPointView extends AbstractView {
   #point = null;
   #destination = null;
   #allOffers = null;
   #selectedOffers = null;
-  #element = null;
+
 
   constructor(point, destination, allOffers, selectedOffers) {
+    super();
     this.#point = point;
     this.#destination = destination;
     this.#allOffers = allOffers;
@@ -183,17 +184,25 @@ export default class EditPointView {
     return createEditPointTemplate(this.#point, this.#destination, this.#allOffers, this.#selectedOffers);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.addEventListener('submit', this.#formSubmitHandler);
+  };
 
-    return this.#element;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }
 
 

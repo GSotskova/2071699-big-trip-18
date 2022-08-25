@@ -7,13 +7,14 @@ import PointView from '../view/point-view.js';
 import EmptyEverythingView from '../view/empty-everything-view.js';
 import EmptyPastView from '../view/empty-past-view.js';
 import EmptyFutureView from '../view/empty-future-view.js';
-import {render} from '../render.js';
+import {render, replace} from '../framework/render.js';
 
 export default class RoutePresenter {
   #routeContainer = null;
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
+  #filterModel = null;
 
   #routeComponent = new RouteView();
   #itemNewPointComponent = new ItemView();
@@ -21,17 +22,18 @@ export default class RoutePresenter {
   #routePoints = [];
   #routeOffers = [];
 
-  init = (routeContainer, pointsModel, offersModel, destinationsModel) => {
+  init = (routeContainer, pointsModel, offersModel, destinationsModel, filterModel) => {
     this.#routeContainer = routeContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+    this.#filterModel = filterModel;
     this.#routePoints = [...this.#pointsModel.points];
     this.#routeOffers = [...this.#offersModel.allOffers];
 
 
     if (this.#routePoints.length === 0) {
-      this.#renderMsgEmpty();
+      this.#renderMsgEmpty(this.#filterModel);
     } else {
       render(new SortView(), this.#routeContainer);
       render(this.#routeComponent, this.#routeContainer);
@@ -53,11 +55,11 @@ export default class RoutePresenter {
 
 
     const replacePontToForm = () => {
-      this.#routeComponent.element.replaceChild(pointEditComponent.element,pointComponent.element);
+      replace(pointEditComponent,pointComponent);
     };
 
     const replaceFormToPoint = () => {
-      this.#routeComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
+      replace(pointComponent, pointEditComponent);
     };
 
     const onEscKeyDown = (evt) => {
@@ -68,18 +70,17 @@ export default class RoutePresenter {
       }
     };
 
-    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    pointComponent.setEditClickHandler(() => {
       replacePontToForm();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    pointEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    pointEditComponent.setClickHandler(() => {
       replaceFormToPoint();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    pointEditComponent.element.addEventListener('submit', (evt) => {
-      evt.preventDefault();
+    pointEditComponent.setFormSubmitHandler(() => {
       replaceFormToPoint();
       document.removeEventListener('keydown', onEscKeyDown);
     });
@@ -88,8 +89,7 @@ export default class RoutePresenter {
 
   };
 
-  #renderMsgEmpty = () => {
-    const filterRadioElements = document.querySelectorAll('.trip-filters__filter-input');
+  #renderMsgEmpty = (filterModel) => {
     const withoutPointComponent = new EmptyEverythingView();
     const withoutPointPastComponent = new EmptyPastView();
     const withoutPointFutureComponent = new EmptyFutureView();
@@ -97,9 +97,8 @@ export default class RoutePresenter {
     render(withoutPointComponent, this.#routeContainer);//изначально выводим сообщение для всех точек маршрута
 
     //в зависимости от выбранного фильтра меняем сообщение
-    const onReplaceMsgOfEmpty = (evt) => {
-      this.#routeContainer.querySelector('.trip-events__msg').remove();
-      switch (evt.target.value) {
+    const onReplaceMsgOfEmpty = (filterValue) => {
+      switch (filterValue) {
         case 'everything':
           render(withoutPointComponent, this.#routeContainer);
           break;
@@ -113,6 +112,6 @@ export default class RoutePresenter {
 
     };
 
-    filterRadioElements.forEach((el) => el.addEventListener('change', onReplaceMsgOfEmpty));
+    filterModel.setEmptyEverythingMsg((evt) => onReplaceMsgOfEmpty(evt.target.value));
   };
 }
