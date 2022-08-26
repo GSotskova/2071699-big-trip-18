@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomNumber} from '../utils.js';
+import {getRandomInteger, getRandomNumber} from '../utils/common.js';
 import {DESCRIPTIONS, TYPES, CITIES} from '../constants.js';
 import dayjs from 'dayjs';
 

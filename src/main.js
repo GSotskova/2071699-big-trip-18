@@ -1,5 +1,5 @@
 import FilterView from './view/filter-view.js';
-import {render} from './render.js';
+import {render} from './framework/render.js';
 import RoutePresenter from './presenter/route-presenter.js';
 import PointsModel from './model/points-model.js';
 import OffersModel from './model/offers-model.js';
@@ -15,6 +15,7 @@ const pointsModel = new PointsModel();
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 const routePresenter = new RoutePresenter();
+const filterModel = new FilterView();
 
-render(new FilterView(), siteTripFiltersElement);
-routePresenter.init(siteBodyContainerElement, pointsModel, offersModel, destinationsModel);
+render(filterModel, siteTripFiltersElement);
+routePresenter.init(siteBodyContainerElement, pointsModel, offersModel, destinationsModel, filterModel);

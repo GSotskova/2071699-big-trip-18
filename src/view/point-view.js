@@ -1,6 +1,6 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
-import {getdateDiff} from '../utils.js';
+import {getdateDiff} from '../utils/route.js';
 
 const createOfferTemplate = (selectedOffer) => {
   const {type, price} = selectedOffer;
@@ -67,13 +67,13 @@ const createPointTemplate = (point, destination, selectedOffers) => {
 };
 
 
-export default class PointView {
-  #element = null;
+export default class PointView extends AbstractView {
   #point = null;
   #destination = null;
   #selectedOffers = [];
 
   constructor(point, destination, selectedOffers) {
+    super();
     this.#point = point;
     this.#destination = destination;
     this.#selectedOffers = selectedOffers;
@@ -83,17 +83,15 @@ export default class PointView {
     return createPointTemplate(this.#point, this.#destination, this.#selectedOffers);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 }
 
 

@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createFilterTemplate = () => (
   `<form class="trip-filters" action="#" method="get">
@@ -22,22 +22,21 @@ const createFilterTemplate = () => (
 );
 
 
-export default class FilterView {
-  #element = null;
+export default class FilterView extends AbstractView {
+
 
   get template() {
     return createFilterTemplate();
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setEmptyEverythingMsg = (callback) => {
+    this._callback.change = callback;
+    this.element.querySelectorAll('.trip-filters__filter-input').forEach(() => addEventListener('change', this.#clickEverythingButton));
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickEverythingButton = (evt) => {
+    evt.preventDefault();
+    document.querySelector('.trip-events__msg').remove();
+    this._callback.change(evt);
+  };
 }
