@@ -7,5 +7,19 @@ export const getRandomInteger = (a = 0, b = 1) => {
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
-
 export const getRandomNumber = (min, max) => Math.round((Math.random() * (max - min ) + min) * 10) / 10;
+
+
+export const updatePoint = (points, pointForUpdate) => {
+
+  const index = points.findIndex((item) => item.id === pointForUpdate.id);
+  if (index === -1) {
+    return points;
+  }
+
+  return [
+    ...points.slice(0, index),
+    pointForUpdate,
+    ...points.slice(index + 1),
+  ];
+};
