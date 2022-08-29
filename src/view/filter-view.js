@@ -30,8 +30,9 @@ export default class FilterView extends AbstractView {
   }
 
   setEmptyEverythingMsg = (callback) => {
+    const inputs = this.element.querySelectorAll('.trip-filters__filter-input');
     this._callback.change = callback;
-    this.element.querySelectorAll('.trip-filters__filter-input').forEach(() => addEventListener('change', this.#clickEverythingButton));
+    inputs.forEach(() => addEventListener('change', this.#clickEverythingButton));
   };
 
   #clickEverythingButton = (evt) => {
