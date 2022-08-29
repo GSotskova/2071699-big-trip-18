@@ -8,5 +8,13 @@ export const DESCRIPTIONS = ['Lorem ipsum dolor sit amet, consectetur adipiscing
 export const TYPES = ['Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
 export const CITIES = [ 'Mexico', 'Bern', 'Prague', 'Ottawa', 'Paris', 'Moscow','London','Athens','New York','Istanbul'];
 
+export const SortType = {
+  DEFAULT: 'Day',
+  DATE_EVENT: 'Event',
+  DATE_TIME: 'Time',
+  DATE_PRICE: 'Price',
+  DATE_OFFERS: 'Offers',
+};
+
 export const POINT_COUNT = 10;
 

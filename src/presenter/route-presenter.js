@@ -5,9 +5,11 @@ import NewPointView from '../view/new-point-view.js';
 import EmptyEverythingView from '../view/empty-everything-view.js';
 import EmptyPastView from '../view/empty-past-view.js';
 import EmptyFutureView from '../view/empty-future-view.js';
-import {render, RenderPosition} from '../framework/render.js';
+import {render, RenderPosition, remove} from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import {updatePoint} from '../utils/common.js';
+import {sortDuration, sortPrice, sortPointDefault} from '../utils/route.js';
+import {SortType} from '../constants.js';
 
 export default class RoutePresenter {
   #routeContainer = null;
@@ -22,10 +24,14 @@ export default class RoutePresenter {
   #routePoints = [];
   #routeOffers = [];
 
-  #sortComponent = new SortView();
+  #currentSortType = SortType.DEFAULT;
+  #sourcedRoutePoints = [];
+  #sortComponent = new SortView(this.#currentSortType);
+
   #newPointComponent = new NewPointView();
 
   #pointPresenter = new Map();
+
 
   init = (routeContainer, pointsModel, offersModel, destinationsModel, filterModel) => {
     this.#routeContainer = routeContainer;
@@ -33,8 +39,10 @@ export default class RoutePresenter {
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
     this.#filterModel = filterModel;
-    this.#routePoints = [...this.#pointsModel.points];
+    this.#routePoints = [...this.#pointsModel.points].sort(sortPointDefault);
     this.#routeOffers = [...this.#offersModel.allOffers];
+
+    this.#sourcedRoutePoints = [...this.#pointsModel.points].sort(sortPointDefault);
 
     this.#renderRoute();
 
@@ -54,8 +62,41 @@ export default class RoutePresenter {
     this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, destination, this.#routeOffers, pointOffers);
   };
 
+  #sortPoints = (sortType) => {
+    switch (sortType) {
+      case SortType.DATE_TIME:
+        this.#routePoints.sort(sortDuration);
+        break;
+      case SortType.DATE_PRICE:
+        this.#routePoints.sort(sortPrice);
+        break;
+      default:
+        this.#routePoints = [...this.#sourcedRoutePoints];
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+    this.#sortPoints(sortType);
+    /*Перерисовываем компонент сортировки, т.к. меняется выбранный пункт меню и нужно обновить свойство checked */
+    this.#clearSort();
+    this.#sortComponent = new SortView(this.#currentSortType);
+    this.#renderSort();
+    this.#clearPointList();
+    this.#renderPointList();
+  };
+
   #renderSort = () => {
     render(this.#sortComponent, this.#routeContainer, RenderPosition.AFTERBEGIN);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+  };
+
+  #clearSort = () => {
+    remove(this.#sortComponent);
   };
 
   #renderNewPoint = () => {
@@ -122,7 +163,7 @@ export default class RoutePresenter {
       return;
     }
     this.#renderSort();
-    this.#renderNewPoint();
+    // this.#renderNewPoint();
     this.#renderPointList();
 
   };

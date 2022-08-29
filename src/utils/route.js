@@ -17,3 +17,19 @@ export const getdateDiff = (date1, date2) => {
 
   return `${strDay} ${strHour} ${strMin}`;
 };
+
+
+export const sortDuration = (point1,point2) => {
+  const duration1 = point1.dateTo.diff(point1.dateFrom);
+  const duration2 = point2.dateTo.diff(point2.dateFrom);
+  return duration2 - duration1;
+};
+
+export const sortPrice = (point1,point2) => point2.price - point1.price;
+
+
+export const sortPointDefault = (point1,point2) => {
+  const date1 = point1.dateFrom;
+  const date2 = point2.dateFrom;
+  return date1 - date2;
+};
