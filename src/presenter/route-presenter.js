@@ -163,7 +163,6 @@ export default class RoutePresenter {
       return;
     }
     this.#renderSort();
-    // this.#renderNewPoint();
     this.#renderPointList();
 
   };
