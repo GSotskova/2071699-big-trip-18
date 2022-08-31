@@ -29,8 +29,6 @@ const createPointTemplate = (point, destination, selectedOffers) => {
     offerTemplate += createOfferTemplate(el);
   });
 
-  const favoritePoint = isFavorite ? 'visually-hidden' : '';
-
   return (
     `<li class="trip-events__item">
       <div class="event">
@@ -55,7 +53,7 @@ const createPointTemplate = (point, destination, selectedOffers) => {
           ${offerTemplate}
         </ul>
         <button class="event__favorite-btn event__favorite-btn--active" type="button">
-          <span class="${favoritePoint}">Add to favorite</span>
+          <span class="${isFavorite ? 'visually-hidden' : ''}">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
             <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
           </svg>
@@ -92,7 +90,8 @@ export default class PointView extends AbstractView {
 
   setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
-    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+    const favoriteButton = this.element.querySelector('.event__favorite-btn');
+    favoriteButton.addEventListener('click', this.#favoriteClickHandler);
   };
 
   #editClickHandler = (evt) => {
