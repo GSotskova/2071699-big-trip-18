@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const DESCRIPTIONS = ['Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra.',
@@ -16,5 +18,16 @@ export const SortType = {
   DATE_OFFERS: 'Offers',
 };
 
-export const POINT_COUNT = 10;
+export const POINT_COUNT = 9;
 
+
+export const pointEmpty = {
+  price: '',
+  dateFrom: dayjs(),
+  dateTo:dayjs(),
+  destination: 0,
+  id: null,
+  isFavorite: false,
+  offers: [],
+  type: 'Flight',
+};

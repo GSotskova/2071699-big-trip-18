@@ -11,11 +11,6 @@ const generateDescription = () => {
   return DESCRIPTIONS[randomIndex];
 };
 
-const generateCity = () => {
-  const randomIndex = getRandomInteger(0, CITIES.length - 1);
-  return CITIES[randomIndex];
-};
-
 //генерация даты начала и даты окончания
 const generateDate = () => {
   const dayGap = getRandomInteger(1, 31);
@@ -33,10 +28,11 @@ const generateDate = () => {
 export const generateDestination = (i) => ({
   id: i, //идентификато начитываем при создании массивы array.from - просто порядковый номер
   description: generateDescription(),
-  name:  generateCity(),
+  name:  CITIES[i - 1],
   pictures: [
     {
-      src: `http://picsum.photos/248/152?r=${getRandomInteger(0, 100)}`,
+      // src: `http://picsum.photos/248/152?r=${getRandomInteger(0, 100)}`,
+      src: `https://placekitten.com//248/152?r=${getRandomInteger(0, 100)}`,
       description: generateDescription()
     }
   ]
@@ -46,15 +42,26 @@ export const generateDestination = (i) => ({
 
 export const generateOffer = (i) => ({
   id:i,
-  type: TYPES[i - 1],//чтобы не было задвоение берем значения из массива по порядку
-  title: 'Upgrade to a business class',
+  title: `offer ${i}`,
   price: getRandomInteger(50, 200)
 });
 
 
+export const generateOffersByType = (i) => {
+  const stepNum = i - 1;
+  const OFFERS = new Set(Array.from({length: 5},(_v,i) => i + 5 * stepNum + 1));
+  return {
+    type: TYPES[i - 1],
+    offers: [...OFFERS]
+  };};
+
 export const generatePoint = (i) => {
-  const randomNumber = getRandomInteger(0, 5);
-  const OFFERS = new Set(Array.from({length: randomNumber},() => getRandomInteger(1, TYPES.length))); //формируем массив с уникальными значениями
+  const randomNumber = getRandomInteger(0, 4);
+  const stepNum = i - 1;
+  const OFFERS = new Set(Array.from({length: randomNumber},(_v,i) => i + 5 * stepNum + 1)); //формируем массив с уникальными значениями
+
+  //const OFFERS = new Set(Array.from({length: 5},(_v,i) => i + 5 * stepNum + 1));
+
   const datePoint = generateDate();
   return {
     price: getRandomInteger(100, 500),
@@ -64,7 +71,7 @@ export const generatePoint = (i) => {
     id: i,
     isFavorite: false,
     offers: [...OFFERS],
-    type: generateType(),
+    type: TYPES[i - 1],
   };
 };
 

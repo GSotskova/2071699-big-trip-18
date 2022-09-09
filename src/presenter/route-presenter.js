@@ -1,7 +1,6 @@
 import RouteView from '../view/route-view.js';
 import SortView from '../view/sort-view.js';
-import ItemView from '../view/item-view.js';
-import NewPointView from '../view/new-point-view.js';
+import EditPointView from '../view/edit-point-view.js';
 import EmptyEverythingView from '../view/empty-everything-view.js';
 import EmptyPastView from '../view/empty-past-view.js';
 import EmptyFutureView from '../view/empty-future-view.js';
@@ -9,7 +8,8 @@ import {render, RenderPosition, remove} from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import {updatePoint} from '../utils/common.js';
 import {sortDuration, sortPrice, sortPointDefault} from '../utils/route.js';
-import {SortType} from '../constants.js';
+import {getAllOfferType} from '../utils/point.js';
+import {SortType, pointEmpty} from '../constants.js';
 
 export default class RoutePresenter {
   #routeContainer = null;
@@ -17,32 +17,42 @@ export default class RoutePresenter {
   #offersModel = null;
   #destinationsModel = null;
   #filterModel = null;
+  #addPointButton = null;
 
   #routeComponent = new RouteView();
-  #itemNewPointComponent = new ItemView();
 
   #routePoints = [];
   #routeOffers = [];
 
   #currentSortType = SortType.DEFAULT;
+  #defaultSortType = SortType.DEFAULT;
   #sourcedRoutePoints = [];
   #sortComponent = new SortView(this.#currentSortType);
 
-  #newPointComponent = new NewPointView();
-
   #pointPresenter = new Map();
 
+  #allDestinations = [];
+  #pointEmpty = pointEmpty;
+  #pointNewComponent = null;
+  #typeFormElement = 'New'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
 
-  init = (routeContainer, pointsModel, offersModel, destinationsModel, filterModel) => {
+  init = (routeContainer, pointsModel, offersModel, destinationsModel, filterModel, addPointButton) => {
+
     this.#routeContainer = routeContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
     this.#filterModel = filterModel;
+    this.#addPointButton = addPointButton;
     this.#routePoints = [...this.#pointsModel.points].sort(sortPointDefault);
-    this.#routeOffers = [...this.#offersModel.allOffers];
+    this.#routeOffers = getAllOfferType([...this.#offersModel.offersByType], [...this.#offersModel.allOffers]);
 
     this.#sourcedRoutePoints = [...this.#pointsModel.points].sort(sortPointDefault);
+    this.#allDestinations = [...this.#destinationsModel.destinations];
+
+    this.#pointNewComponent = new EditPointView(this.#pointEmpty, this.#allDestinations, this.#routeOffers, this.#typeFormElement);
+    this.#pointNewComponent.setFormSubmitHandler(this.#handleFormSubmit);
+    this.#pointNewComponent.setClickResetHandler(this.#closeNewFormClick);
 
     this.#renderRoute();
 
@@ -55,11 +65,7 @@ export default class RoutePresenter {
 
   #handlePointChange = (updatedPoint) => {
     this.#routePoints = updatePoint(this.#routePoints, updatedPoint);
-
-    const destination = this.#destinationsModel.getDestinations(updatedPoint);
-    const pointOffers = [...this.#offersModel.getPointOffer(updatedPoint)];
-
-    this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, destination, this.#routeOffers, pointOffers);
+    this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#allDestinations, this.#routeOffers);
   };
 
   #sortPoints = (sortType) => {
@@ -99,25 +105,18 @@ export default class RoutePresenter {
     remove(this.#sortComponent);
   };
 
-  #renderNewPoint = () => {
-    render(this.#itemNewPointComponent, this.#routeComponent.element, RenderPosition.AFTERBEGIN);
-    render(this.#newPointComponent, this.#itemNewPointComponent.element, RenderPosition.AFTERBEGIN);
-  };
+  #renderPoint = (point, allDestinations, allOffers) => {
 
-  #renderPoint = (point, destinationModel, allOffers, offersModel) => {
-    const destination = destinationModel.getDestinations(point);
-    const pointOffers = [...offersModel.getPointOffer(point)];
-
-    const pointPresenter = new PointPresenter(this.#routeComponent.element, this.#handlePointChange, this.#handleModeChange);
-    pointPresenter.init(point, destination, allOffers, pointOffers);
+    const pointPresenter = new PointPresenter(this.#routeComponent.element, this.#handlePointChange, this.#handleModeChange, this.#pointNewComponent);
+    pointPresenter.init(point, allDestinations, allOffers);
     this.#pointPresenter.set(point.id, pointPresenter);
 
   };
 
-  #renderPoints = (from, to, destinationModel, allOffers, offersModel) => {
+  #renderPoints = (from, to, allDestinations, allOffers) => {
     this.#routePoints
       .slice(from, to)
-      .forEach((point) => this.#renderPoint(point, destinationModel, allOffers, offersModel));
+      .forEach((point) => this.#renderPoint(point, allDestinations, allOffers));
   };
 
   #clearPointList = () => {
@@ -127,7 +126,7 @@ export default class RoutePresenter {
 
   #renderPointList = () => {
     render(this.#routeComponent, this.#routeContainer);
-    this.#renderPoints(0, this.#routePoints.length, this.#destinationsModel, this.#routeOffers, this.#offersModel);
+    this.#renderPoints(0, this.#routePoints.length, this.#allDestinations, this.#routeOffers);
   };
 
   #renderMsgEmpty = (filterModel) => {
@@ -156,6 +155,40 @@ export default class RoutePresenter {
     filterModel.setEmptyEverythingMsg((evt) => onReplaceMsgOfEmpty(evt.target.value));
   };
 
+  #renderNewPoint = () => {
+    this.#handleModeChange();
+    this.#handleSortTypeChange(this.#defaultSortType);
+    this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
+    render(this.#pointNewComponent, this.#routeComponent.element, RenderPosition.AFTERBEGIN);
+  };
+
+  #renderFormNewPoint = () => {
+    this.#addPointButton.addEventListener('click', this.#renderNewPoint);
+  };
+
+
+  #closeNewFormSubmit = () => {
+    remove(this.#pointNewComponent);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
+      this.#closeNewFormSubmit();
+    }
+  };
+
+  #handleFormSubmit = () => {
+    this.#closeNewFormSubmit();
+  };
+
+
+  #closeNewFormClick = () => {
+    this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
+    remove(this.#pointNewComponent);
+  };
 
   #renderRoute = () => {
     if (this.#routePoints.length === 0) {
@@ -163,7 +196,7 @@ export default class RoutePresenter {
       return;
     }
     this.#renderSort();
+    this.#renderFormNewPoint();
     this.#renderPointList();
-
   };
 }
