@@ -22,7 +22,7 @@ export default class PointPresenter {
   #pointNewComponent = null;
 
   #mode = Mode.DEFAULT;
-  #typeFormElement = 'Edit'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
+  #typeFormName = 'Edit'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
 
   constructor(PointListContainer, changeData, changeMode, pointNewComponent) {
     this.#PointListContainer = PointListContainer;
@@ -41,7 +41,7 @@ export default class PointPresenter {
 
     this.#pointComponent = new PointView(point, destinations, allOffers);
 
-    this.#pointEditComponent = new EditPointView(point, destinations, allOffers, this.#typeFormElement);
+    this.#pointEditComponent = new EditPointView(point, destinations, allOffers, this.#typeFormName);
 
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);

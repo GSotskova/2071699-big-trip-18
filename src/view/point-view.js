@@ -1,10 +1,10 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 import {getdateDiff} from '../utils/route.js';
-import {getDestinationById, getOfferPoint} from '../utils/point.js';
+import {getDestinationById, getPointOffers} from '../utils/point.js';
 
 const createOfferTemplate = (selectedOffer) => {
-  const { price, title} = selectedOffer;
+  const {price, title} = selectedOffer;
 
   return (
     `<li class="event__offer">
@@ -26,7 +26,7 @@ const createPointTemplate = (point, destinations, allOffers) => {
 
   let offerTemplate = '';
 
-  const selectedOffers = getOfferPoint(offers, allOffers);
+  const selectedOffers = getPointOffers(offers, allOffers);
   selectedOffers.forEach((el) => {
     offerTemplate += createOfferTemplate(el);
   });
@@ -87,7 +87,8 @@ export default class PointView extends AbstractView {
 
   setEditClickHandler = (callback) => {
     this._callback.editClick = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    const rollUpButton = this.element.querySelector('.event__rollup-btn');
+    rollUpButton.addEventListener('click', this.#editClickHandler);
   };
 
   setFavoriteClickHandler = (callback) => {

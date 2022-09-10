@@ -5,26 +5,31 @@ export const getDestinationById = (pointDestination, destinations) => destinatio
 export const getDestinationIdByName = (name, destinations) => destinations.find((destination) => destination.name === name).id;
 
 //получаем список наименований всех точек назначения
-export const getDestinationListName = (destinations) => destinations.map((el) => el.name);
+export const getDestinationsNamesList = (destinations) => destinations.map((el) => el.name);
 
 //getAllOfferType - Получаем "склеенный" массив объектов OffersByType и Offers (записываем в totalOffers)
-const getOffersType = (currentOffer, allOffers, addedOffers) => {
+const getOffersByCurrentType = (currentOffer, allOffers, addedOffers) => {
   let objNew = {};
-  currentOffer.offers.forEach((el) => {objNew = allOffers.find((offer) => el === offer.id);
+  const OffersByCurrentType = [];
+  currentOffer.offers.forEach((el) => {
+    objNew = allOffers.find((offer) => el === offer.id);
     objNew['type'] = currentOffer.type;
-    if (!addedOffers.includes(objNew)) {addedOffers.push(objNew);}
+    if (!addedOffers.includes(objNew)) {
+      OffersByCurrentType.push(objNew);
+    }
   });
-  return addedOffers;
+  return OffersByCurrentType;
 };
 
-export const getAllOfferType = (offersByType, allOffers) => {
-  const totalOffers = [];
-  offersByType.forEach((el) => el.offers.length !== 0 ? getOffersType(el, allOffers, totalOffers) : '');
-  return totalOffers; };
+export const getAllOffersWithType = (offersByType, allOffers) => {
+  let totalOffers = [];
+  offersByType.forEach((el) => {
+    if (el.offers.length !== 0) {
+      totalOffers = [...totalOffers,...getOffersByCurrentType(el, allOffers, totalOffers)];
+    }
+  });
+  return totalOffers;
+};
 
-//получаем массив опций для конкретной точки маршрута
-export const getOfferPoint = (pointOffers, allOffers) =>pointOffers.map((offerId) => allOffers.find((offer) => offer.id === offerId));
-
-//получаем массив опций для конкретного типа точки маршрута
-export const getOfferTypePoint = (point, allOffers) => point.offers.map((type) => allOffers.find((offer) => offer.type === type));
-
+//получаем массив объектов с опциями для конкретной точки маршрута
+export const getPointOffers = (pointOffers, allOffers) =>pointOffers.map((offerId) => allOffers.find((offer) => offer.id === offerId));

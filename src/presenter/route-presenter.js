@@ -8,7 +8,7 @@ import {render, RenderPosition, remove} from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import {updatePoint} from '../utils/common.js';
 import {sortDuration, sortPrice, sortPointDefault} from '../utils/route.js';
-import {getAllOfferType} from '../utils/point.js';
+import {getAllOffersWithType} from '../utils/point.js';
 import {SortType, pointEmpty} from '../constants.js';
 
 export default class RoutePresenter {
@@ -34,7 +34,7 @@ export default class RoutePresenter {
   #allDestinations = [];
   #pointEmpty = pointEmpty;
   #pointNewComponent = null;
-  #typeFormElement = 'New'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
+  #typeFormName = 'New'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
 
   init = (routeContainer, pointsModel, offersModel, destinationsModel, filterModel, addPointButton) => {
 
@@ -45,12 +45,12 @@ export default class RoutePresenter {
     this.#filterModel = filterModel;
     this.#addPointButton = addPointButton;
     this.#routePoints = [...this.#pointsModel.points].sort(sortPointDefault);
-    this.#routeOffers = getAllOfferType([...this.#offersModel.offersByType], [...this.#offersModel.allOffers]);
+    this.#routeOffers = getAllOffersWithType([...this.#offersModel.offersByType], [...this.#offersModel.allOffers]);
 
     this.#sourcedRoutePoints = [...this.#pointsModel.points].sort(sortPointDefault);
     this.#allDestinations = [...this.#destinationsModel.destinations];
 
-    this.#pointNewComponent = new EditPointView(this.#pointEmpty, this.#allDestinations, this.#routeOffers, this.#typeFormElement);
+    this.#pointNewComponent = new EditPointView(this.#pointEmpty, this.#allDestinations, this.#routeOffers, this.#typeFormName);
     this.#pointNewComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointNewComponent.setClickResetHandler(this.#closeNewFormClick);
 
@@ -160,6 +160,7 @@ export default class RoutePresenter {
     this.#handleSortTypeChange(this.#defaultSortType);
     this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
     render(this.#pointNewComponent, this.#routeComponent.element, RenderPosition.AFTERBEGIN);
+    this.#addPointButton.setAttribute('disabled', 'true');
   };
 
   #renderFormNewPoint = () => {
@@ -169,6 +170,7 @@ export default class RoutePresenter {
 
   #closeNewFormSubmit = () => {
     remove(this.#pointNewComponent);
+    this.#addPointButton.removeAttribute('disabled');
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
@@ -188,6 +190,7 @@ export default class RoutePresenter {
   #closeNewFormClick = () => {
     this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
     remove(this.#pointNewComponent);
+    this.#addPointButton.removeAttribute('disabled');
   };
 
   #renderRoute = () => {
