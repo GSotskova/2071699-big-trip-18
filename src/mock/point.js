@@ -1,5 +1,5 @@
 import {getRandomInteger, getRandomNumber} from '../utils/common.js';
-import {DESCRIPTIONS, TYPES, CITIES} from '../constants.js';
+import {DESCRIPTIONS, TYPES, CITIES, COUNT_OFFERS_TYPE} from '../constants.js';
 import dayjs from 'dayjs';
 
 const generateDescription = () => {
@@ -44,8 +44,7 @@ export const generateOffer = (i) => ({
 
 export const generateOffersByType = (i) => {
   const stepNum = i - 1;
-  const countOffersInType = 5;
-  const OFFERS = new Set(Array.from({length: countOffersInType},(_v, y) => y + countOffersInType * stepNum + 1));
+  const OFFERS = new Set(Array.from({length: COUNT_OFFERS_TYPE},(_v, y) => y + COUNT_OFFERS_TYPE * stepNum + 1));
   return {
     type: TYPES[i - 1],
     offers: [...OFFERS]
@@ -54,8 +53,7 @@ export const generateOffersByType = (i) => {
 export const generatePoint = (i) => {
   const randomNumber = getRandomInteger(0, 4);
   const stepNum = i - 1;
-  const countOffersInType = 5;
-  const OFFERS = new Set(Array.from({length: randomNumber},(_v,y) => y + countOffersInType * stepNum + 1)); //формируем массив с уникальными значениями
+  const OFFERS = new Set(Array.from({length: randomNumber},(_v,y) => y + COUNT_OFFERS_TYPE * stepNum + 1)); //формируем массив с уникальными значениями
 
   const datePoint = generateDate();
   return {

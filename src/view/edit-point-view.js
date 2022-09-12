@@ -48,11 +48,11 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
   const date2 = dayjs(dateTo).format('DD/MM/YY HH:mm');
   let offerEditTemplate = '';
   let photoDestination = '';
-  let DestinationsListTemplate = '';
+  let destinationsListTemplate = '';
   let destinationElement = '';
   const destinationsNamesList = getDestinationsNamesList(destinations);
   destinationsNamesList.forEach((nameDestination) => {
-    DestinationsListTemplate += createListDestinationsTmpl(nameDestination);
+    destinationsListTemplate += createListDestinationsTmpl(nameDestination);
   });
 
   let currentDestination = {};
@@ -137,7 +137,9 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
 
          <div class="event__field-group  event__field-group--destination">
            <label
-             class="event__label  event__type-output" for="event-destination-1">
+             class="event__label  event__type-output"
+             for="event-destination-1"
+           >
              ${newType}
            </label>
            <input
@@ -147,9 +149,9 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
              name="event-destination"
              value="${currentDestination.name ? currentDestination.name : ''}"
              list="destination-list-1"
-          >
+           >
            <datalist id="destination-list-1">
-            ${DestinationsListTemplate}
+            ${destinationsListTemplate}
            </datalist>
          </div>
 

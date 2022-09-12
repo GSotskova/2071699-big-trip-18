@@ -31,3 +31,5 @@ export const pointEmpty = {
   offers: [],
   type: 'Flight',
 };
+
+export const COUNT_OFFERS_TYPE = 5;
