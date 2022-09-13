@@ -14,37 +14,41 @@ export default class PointPresenter {
   #pointEditComponent = null;
 
   #point = null;
-  #destination = null;
+  #destinations = null;
   #allOffers = null;
-  #pointOffers = null;
 
   #changeData = null;
   #changeMode = null;
+  #pointNewComponent = null;
 
   #mode = Mode.DEFAULT;
+  #typeFormName = 'Edit'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
 
-  constructor(PointListContainer, changeData, changeMode) {
+  constructor(PointListContainer, changeData, changeMode, pointNewComponent) {
     this.#PointListContainer = PointListContainer;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
+    this.#pointNewComponent = pointNewComponent;
   }
 
-  init = (point, destination, allOffers, pointOffers) => {
+  init = (point, destinations, allOffers) => {
     this.#point = point;
-    this.#destination = destination;
+    this.#destinations = destinations;
     this.#allOffers = allOffers;
-    this.#pointOffers = pointOffers;
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
 
-    this.#pointComponent = new PointView(point, destination, pointOffers);
-    this.#pointEditComponent = new EditPointView(point, destination, allOffers, pointOffers);
+    this.#pointComponent = new PointView(point, destinations, allOffers);
+
+    this.#pointEditComponent = new EditPointView(point, destinations, allOffers, this.#typeFormName);
 
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);
     this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#pointEditComponent.setClickHandler(this.#handleClick);
+    this.#pointEditComponent.setClickRollUpHandler(this.#handleClick);
+    this.#pointEditComponent.setClickResetHandler(this.#handleClick);
+
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -68,11 +72,11 @@ export default class PointPresenter {
   destroy = () => {
     remove(this.#pointComponent);
     remove(this.#pointEditComponent);
-
   };
 
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#pointEditComponent.reset(this.#point, this.#destinations);
       this.#replaceFormToPoint();
     }
   };
@@ -93,6 +97,7 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this.#pointEditComponent.reset(this.#point, this.#destinations);
       this.#replaceFormToPoint();
     }
   };
@@ -102,6 +107,7 @@ export default class PointPresenter {
   };
 
   #handleEditClick = () => {
+    remove(this.#pointNewComponent);
     this.#replacePontToForm();
   };
 
@@ -110,6 +116,7 @@ export default class PointPresenter {
   };
 
   #handleClick = () => {
+    this.#pointEditComponent.reset(this.#point, this.#destinations);
     this.#replaceFormToPoint();
   };
 }

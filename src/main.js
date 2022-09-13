@@ -11,6 +11,9 @@ const siteTripFiltersElement = siteHeaderElement.querySelector('.trip-controls__
 const siteBodyElement = document.querySelector('.page-body__page-main');
 const siteBodyContainerElement = siteBodyElement.querySelector('.trip-events');
 
+
+const addPointButtonElement = document.querySelector('.trip-main__event-add-btn');
+
 const pointsModel = new PointsModel();
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
@@ -18,4 +21,4 @@ const routePresenter = new RoutePresenter();
 const filterModel = new FilterView();
 
 render(filterModel, siteTripFiltersElement);
-routePresenter.init(siteBodyContainerElement, pointsModel, offersModel, destinationsModel, filterModel);
+routePresenter.init(siteBodyContainerElement, pointsModel, offersModel, destinationsModel, filterModel, addPointButtonElement);

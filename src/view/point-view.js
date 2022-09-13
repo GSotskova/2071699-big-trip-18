@@ -1,13 +1,14 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 import {getdateDiff} from '../utils/route.js';
+import {getDestinationById, getPointOffers} from '../utils/point.js';
 
 const createOfferTemplate = (selectedOffer) => {
-  const {type, price} = selectedOffer;
+  const {price, title} = selectedOffer;
 
   return (
     `<li class="event__offer">
-        <span class="event__offer-title">${type}</span>
+        <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${price}</span>
     </li>`
@@ -15,9 +16,9 @@ const createOfferTemplate = (selectedOffer) => {
 };
 
 
-const createPointTemplate = (point, destination, selectedOffers) => {
-  const {price, dateFrom, dateTo, type, isFavorite} = point;
-  const {name} = destination;
+const createPointTemplate = (point, destinations, allOffers) => {
+  const {price, dateFrom, dateTo, type, isFavorite, offers, destination} = point;
+  const currentDestination = getDestinationById(destination, destinations);
   const dateFormatDay = dayjs(dateFrom).format('MMM D');
   const timeFrom = dayjs(dateFrom).format('HH:mm');
   const timeTo = dayjs(dateTo).format('HH:mm');
@@ -25,6 +26,7 @@ const createPointTemplate = (point, destination, selectedOffers) => {
 
   let offerTemplate = '';
 
+  const selectedOffers = getPointOffers(offers, allOffers);
   selectedOffers.forEach((el) => {
     offerTemplate += createOfferTemplate(el);
   });
@@ -36,7 +38,7 @@ const createPointTemplate = (point, destination, selectedOffers) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${name} </h3>
+        <h3 class="event__title">${type} ${currentDestination.name} </h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="2019-03-18T10:30">${timeFrom}</time>
@@ -69,23 +71,24 @@ const createPointTemplate = (point, destination, selectedOffers) => {
 
 export default class PointView extends AbstractView {
   #point = null;
-  #destination = null;
-  #selectedOffers = [];
+  #destinations = null;
+  #allOffers = [];
 
-  constructor(point, destination, selectedOffers) {
+  constructor(point, destinations, allOffers) {
     super();
     this.#point = point;
-    this.#destination = destination;
-    this.#selectedOffers = selectedOffers;
+    this.#destinations = destinations;
+    this.#allOffers = allOffers;
   }
 
   get template() {
-    return createPointTemplate(this.#point, this.#destination, this.#selectedOffers);
+    return createPointTemplate(this.#point, this.#destinations, this.#allOffers);
   }
 
   setEditClickHandler = (callback) => {
     this._callback.editClick = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    const rollUpButton = this.element.querySelector('.event__rollup-btn');
+    rollUpButton.addEventListener('click', this.#editClickHandler);
   };
 
   setFavoriteClickHandler = (callback) => {
