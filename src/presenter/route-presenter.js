@@ -52,7 +52,7 @@ export default class RoutePresenter {
 
     this.#pointNewComponent = new EditPointView(this.#pointEmpty, this.#allDestinations, this.#routeOffers, this.#typeFormName);
     this.#pointNewComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#pointNewComponent.setClickResetHandler(this.#closeNewFormClick);
+    this.#pointNewComponent.setClickResetHandler(this.#closeNewForm);
 
     this.#renderRoute();
 
@@ -161,14 +161,17 @@ export default class RoutePresenter {
     this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
     render(this.#pointNewComponent, this.#routeComponent.element, RenderPosition.AFTERBEGIN);
     this.#addPointButton.setAttribute('disabled', 'true');
+    document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #renderFormNewPoint = () => {
+  #initAddPointButton = () => {
     this.#addPointButton.addEventListener('click', this.#renderNewPoint);
+
   };
 
 
-  #closeNewFormSubmit = () => {
+  #closeNewForm = () => {
+    this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
     remove(this.#pointNewComponent);
     this.#addPointButton.removeAttribute('disabled');
     document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -178,19 +181,12 @@ export default class RoutePresenter {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
-      this.#closeNewFormSubmit();
+      this.#closeNewForm();
     }
   };
 
   #handleFormSubmit = () => {
-    this.#closeNewFormSubmit();
-  };
-
-
-  #closeNewFormClick = () => {
-    this.#pointNewComponent.reset(this.#pointEmpty, this.#allDestinations);
-    remove(this.#pointNewComponent);
-    this.#addPointButton.removeAttribute('disabled');
+    this.#closeNewForm();
   };
 
   #renderRoute = () => {
@@ -199,7 +195,7 @@ export default class RoutePresenter {
       return;
     }
     this.#renderSort();
-    this.#renderFormNewPoint();
+    this.#initAddPointButton();
     this.#renderPointList();
   };
 }
