@@ -1,7 +1,9 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import dayjs from 'dayjs';
 import {getDestinationById, getDestinationsNamesList, getDestinationIdByName} from '../utils/point.js';
+import flatpickr from 'flatpickr';
 
+import 'flatpickr/dist/flatpickr.min.css';
 
 const createOfferEditTemplate = (offer, selectedOffersIds) => {
 
@@ -43,9 +45,9 @@ const createDestinationTemplate = (description, photoDestination) => (
 
 
 const createEditPointTemplate = (data, destinations, allOffers, typeFormName) => {
-  const {price, dateFrom, dateTo, newDestinationId, newSelectedOffersIds, newType} = data;
-  const date1 = dayjs(dateFrom).format('DD/MM/YY HH:mm');
-  const date2 = dayjs(dateTo).format('DD/MM/YY HH:mm');
+  const {price, newDateFrom, newDateTo, newDestinationId, newSelectedOffersIds, newType} = data;
+  const date1 = dayjs(newDateFrom).format('DD/MM/YY HH:mm');
+  const date2 = dayjs(newDateTo).format('DD/MM/YY HH:mm');
   let offerEditTemplate = '';
   let photoDestination = '';
   let destinationsListTemplate = '';
@@ -205,7 +207,8 @@ export default class EditPointView extends AbstractStatefulView {
   #destinations = null;
   #allOffers = null;
   #typeFormName = null;
-
+  #newDateFrompicker = null;
+  #newDateTopicker = null;
 
   constructor(point, destinations, allOffers, typeFormName) {
     super();
@@ -214,11 +217,25 @@ export default class EditPointView extends AbstractStatefulView {
     this.#allOffers = allOffers;
     this.#typeFormName = typeFormName;
     this.#setInnerHandlers();
+    this.#setDatepicker();
   }
 
   get template() {
     return createEditPointTemplate(this._state, this.#destinations, this.#allOffers, this.#typeFormName);
   }
+
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#newDateFrompicker) {
+      this.#newDateFrompicker.destroy();
+      this.#newDateFrompicker = null;
+    }
+    if (this.#newDateTopicker) {
+      this.#newDateTopicker.destroy();
+      this.#newDateTopicker = null;
+    }
+  };
 
   reset = (point, destinations) => {
     this.updateElement(
@@ -226,9 +243,44 @@ export default class EditPointView extends AbstractStatefulView {
     );
   };
 
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({
+      newDateFrom: userDate
+    });
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({
+      newDateTo: userDate
+    });
+  };
+
+  #setDatepicker = () => {
+    this.#newDateFrompicker = flatpickr(
+      this.element.querySelector('input[name=event-start-time]'),
+      {
+        enableTime: true,
+        defaultDate: Date.parse(this._state.newDateFrom),
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#dateFromChangeHandler,
+      });
+
+    this.#newDateTopicker = flatpickr(
+      this.element.querySelector('input[name=event-end-time]'),
+      {
+        enableTime: true,
+        defaultDate: Date.parse(this._state.newDateTo),
+        minDate: Date.parse(this._state.newDateFrom),
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#dateToChangeHandler,
+      },
+    );
+  };
+
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
+    this.#setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setClickResetHandler(this._callback.click);
     this.setClickRollUpHandler(this._callback.click);
@@ -309,7 +361,9 @@ export default class EditPointView extends AbstractStatefulView {
     ...point,
     newDestinationId: point.destination,
     newType: point.type,
-    newSelectedOffersIds: point.offers
+    newSelectedOffersIds: point.offers,
+    newDateFrom: point.dateFrom,
+    newDateTo: point.dateTo
   });
 
   static parseStateToPoint = (state) => {
@@ -321,8 +375,14 @@ export default class EditPointView extends AbstractStatefulView {
     if (point.newType) {
       delete point.newType;
     }
-    if (!point.newSelectedOffersIds) {
+    if (point.newSelectedOffersIds) {
       delete point.newSelectedOffersIds;
+    }
+    if (point.newDateFrom) {
+      delete point.newDateFrom;
+    }
+    if (point.newDateTo) {
+      delete point.newDateTo;
     }
     return point;
   };
