@@ -17,7 +17,7 @@ const pointsModel = new PointsModel();
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 const filterModel = new FilterModel();
-const filterPresenter = new FilterPresenter (siteTripFiltersElement, filterModel);
+const filterPresenter = new FilterPresenter(siteTripFiltersElement, filterModel);
 const routePresenter = new RoutePresenter(siteBodyContainerElement, pointsModel, offersModel, destinationsModel, filterModel);
 
 const handleNewTaskFormClose = () => {

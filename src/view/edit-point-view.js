@@ -208,8 +208,8 @@ export default class EditPointView extends AbstractStatefulView {
   #destinations = null;
   #allOffers = null;
   #typeFormName = null;
-  #dateFrompicker = null;
-  #dateTopicker = null;
+  #dateFromPicker = null;
+  #dateToPicker = null;
 
   constructor(point, destinations, allOffers, typeFormName) {
     super();
@@ -228,13 +228,13 @@ export default class EditPointView extends AbstractStatefulView {
   removeElement = () => {
     super.removeElement();
 
-    if (this.#dateFrompicker) {
-      this.#dateFrompicker.destroy();
-      this.#dateFrompicker = null;
+    if (this.#dateFromPicker) {
+      this.#dateFromPicker.destroy();
+      this.#dateFromPicker = null;
     }
-    if (this.#dateTopicker) {
-      this.#dateTopicker.destroy();
-      this.#dateTopicker = null;
+    if (this.#dateToPicker) {
+      this.#dateToPicker.destroy();
+      this.#dateToPicker = null;
     }
   };
 
@@ -257,7 +257,7 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   #setDatepicker = () => {
-    this.#dateFrompicker = flatpickr(
+    this.#dateFromPicker = flatpickr(
       this.element.querySelector('input[name=event-start-time]'),
       {
         enableTime: true,
@@ -266,7 +266,7 @@ export default class EditPointView extends AbstractStatefulView {
         onChange: this.#dateFromChangeHandler,
       });
 
-    this.#dateTopicker = flatpickr(
+    this.#dateToPicker = flatpickr(
       this.element.querySelector('input[name=event-end-time]'),
       {
         enableTime: true,
@@ -396,7 +396,12 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   static parseStateToPointSave = (state) => {
-    const point = {...state, destination: state.newDestinationId, type: state.newType, offers: state.newSelectedOffersIds};
+    const point = {
+      ...state,
+      destination: state.newDestinationId,
+      type: state.newType,
+      offers: state.newSelectedOffersIds
+    };
     EditPointView.parseStateToPointReset(state);
     return point;
   };

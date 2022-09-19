@@ -6,14 +6,19 @@ const createFilterItemTemplate = (filter, currentFilterType) => {
   return (
     `<div class="trip-filters__filter">
       <input
-       id="filter-_${filterLower}"
+       id="filter-${filterLower}"
        class="trip-filters__filter-input  visually-hidden"
        type="radio"
        name="trip-filter"
        value="${filter}"
        ${filter === currentFilterType ? 'checked' : ''}
       >
-      <label class="trip-filters__filter-label" for="filter-_${filterLower}">${filter}</label>
+      <label
+        class="trip-filters__filter-label"
+        for="filter-${filterLower}"
+      >
+      ${filter}
+      </label>
     </div>
     `
   );

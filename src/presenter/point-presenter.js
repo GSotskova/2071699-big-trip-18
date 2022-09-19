@@ -104,7 +104,10 @@ export default class PointPresenter {
     this.#changeData(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
-      {...this.#point, isFavorite: !this.#point.isFavorite},
+      {
+        ...this.#point,
+        isFavorite: !this.#point.isFavorite
+      },
     );
   };
 
@@ -113,12 +116,12 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (update) => {
-    const isMAJORUpdate =
+    const isMajorUpdate =
         !isDatesEqual(this.#point.dateFrom, update.dateFrom) ||
         !isDatesEqual(this.#point.dateTo, update.dateTo);
     this.#changeData(
       UserAction.UPDATE_POINT,
-      isMAJORUpdate ? UpdateType.MAJOR : UpdateType.PATCH,
+      isMajorUpdate ? UpdateType.MAJOR : UpdateType.PATCH,
       update,
     );
     this.#replaceFormToPoint();

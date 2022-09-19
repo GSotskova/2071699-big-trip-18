@@ -5,7 +5,7 @@ import {nanoid} from 'nanoid';
 import {pointEmpty} from '../constants.js';
 
 export default class PointNewPresenter {
-  #PointListContainer = null;
+  #pointListContainer = null;
   #pointEditComponent = null;
 
   #destinations = null;
@@ -15,8 +15,8 @@ export default class PointNewPresenter {
 
   #destroyCallback = null;
 
-  constructor(PointListContainer, changeData) {
-    this.#PointListContainer = PointListContainer;
+  constructor(pointListContainer, changeData) {
+    this.#pointListContainer = pointListContainer;
     this.#changeData = changeData;
   }
 
@@ -32,7 +32,7 @@ export default class PointNewPresenter {
     this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointEditComponent.setClickResetHandler(this.#handleDeleteClick);
 
-    render(this.#pointEditComponent, this.#PointListContainer, RenderPosition.AFTERBEGIN);
+    render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#escKeyDownHandler);
 
@@ -62,7 +62,10 @@ export default class PointNewPresenter {
     this.#changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      {id: nanoid(), ...point},
+      {
+        id: nanoid(),
+        ...point
+      },
     );
     this.destroy();
   };
