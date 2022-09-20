@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 //находим пункт назначения для конкретной точки по ID
 export const getDestinationById = (pointDestination, destinations) => destinations.find((destination) => destination.id === pointDestination);
 
@@ -33,3 +35,6 @@ export const getAllOffersWithType = (offersByType, allOffers) => {
 
 //получаем массив объектов с опциями для конкретной точки маршрута
 export const getPointOffers = (pointOffersIds, allOffers) =>pointOffersIds.map((offerId) => allOffers.find((offer) => offer.id === offerId));
+
+
+export const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');

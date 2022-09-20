@@ -1,6 +1,8 @@
 import {render, replace, remove} from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
 import PointView from '../view/point-view.js';
+import {UserAction, UpdateType} from '../constants.js';
+import {isDatesEqual} from '../utils/point.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -19,16 +21,14 @@ export default class PointPresenter {
 
   #changeData = null;
   #changeMode = null;
-  #pointNewComponent = null;
 
   #mode = Mode.DEFAULT;
   #typeFormName = 'Edit'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
 
-  constructor(PointListContainer, changeData, changeMode, pointNewComponent) {
+  constructor(PointListContainer, changeData, changeMode) {
     this.#PointListContainer = PointListContainer;
     this.#changeData = changeData;
     this.#changeMode = changeMode;
-    this.#pointNewComponent = pointNewComponent;
   }
 
   init = (point, destinations, allOffers) => {
@@ -40,14 +40,12 @@ export default class PointPresenter {
     const prevPointEditComponent = this.#pointEditComponent;
 
     this.#pointComponent = new PointView(point, destinations, allOffers);
-
     this.#pointEditComponent = new EditPointView(point, destinations, allOffers, this.#typeFormName);
-
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);
     this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointEditComponent.setClickRollUpHandler(this.#handleClick);
-    this.#pointEditComponent.setClickResetHandler(this.#handleClick);
+    this.#pointEditComponent.setClickResetHandler(this.#handleDeleteClick);
 
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
@@ -103,20 +101,42 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {
+        ...this.#point,
+        isFavorite: !this.#point.isFavorite
+      },
+    );
   };
 
   #handleEditClick = () => {
-    remove(this.#pointNewComponent);
     this.#replacePontToForm();
   };
 
-  #handleFormSubmit = () => {
+  #handleFormSubmit = (update) => {
+    const isMajorUpdate =
+        !isDatesEqual(this.#point.dateFrom, update.dateFrom) ||
+        !isDatesEqual(this.#point.dateTo, update.dateTo);
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      isMajorUpdate ? UpdateType.MAJOR : UpdateType.PATCH,
+      update,
+    );
     this.#replaceFormToPoint();
   };
 
   #handleClick = () => {
     this.#pointEditComponent.reset(this.#point, this.#destinations);
     this.#replaceFormToPoint();
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MAJOR,
+      point,
+    );
   };
 }

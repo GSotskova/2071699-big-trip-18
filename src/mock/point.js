@@ -9,7 +9,7 @@ const generateDescription = () => {
 
 //генерация даты начала и даты окончания
 const generateDate = () => {
-  const dayGap = getRandomInteger(1, 31);
+  const dayGap = getRandomInteger(-10, 31);
   const hourGap = getRandomNumber(1, 24);
   const minGap = getRandomNumber(1, 60);
   //в кач-ве даты начала берем текущую дату плюс случайное кол-во дней, плюс случ кол-во часов и минут
