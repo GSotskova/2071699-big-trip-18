@@ -1,24 +1,23 @@
+import {render, RenderPosition, remove} from '../framework/render.js';
 import RouteView from '../view/route-view.js';
 import SortView from '../view/sort-view.js';
-import PointNewPresenter from './point-new-presenter.js';
 import EmptyView from '../view/empty-view.js';
-import {render, RenderPosition, remove} from '../framework/render.js';
+import LoadingView from '../view/loading-view.js';
+import ErrorLoadingView from '../view/error-loading-view.js';
 import PointPresenter from './point-presenter.js';
+import PointNewPresenter from './point-new-presenter.js';
 import {sortDuration, sortPrice, sortPointDefault} from '../utils/route.js';
-import {getAllOffersWithType} from '../utils/point.js';
-import {SortType, UpdateType, UserAction, FilterType} from '../constants.js';
 import {filter} from '../utils/filter.js';
+import {SortType, UpdateType, UserAction, FilterType} from '../constants.js';
 
 export default class RoutePresenter {
   #routeContainer = null;
   #pointsModel = null;
-  #offersModel = null;
-  #destinationsModel = null;
   #filterModel = null;
 
   #routeComponent = new RouteView();
-
-  #routeOffers = [];
+  #loadingComponent = new LoadingView();
+  #errLoadingComponent = new ErrorLoadingView();
 
   #currentSortType = SortType.DEFAULT;
   #sortComponent = null;
@@ -26,21 +25,20 @@ export default class RoutePresenter {
   #pointPresenter = new Map();
   #pointNewPresenter = null;
 
-  #allDestinations = [];
   #noPointComponent = null;
   #filterType = FilterType.EVERYTHING;
+  #isLoading = true;
 
-  constructor(routeContainer, pointsModel, offersModel, destinationsModel, filterModel) {
+  constructor(routeContainer, pointsModel, filterModel) {
     this.#routeContainer = routeContainer;
     this.#pointsModel = pointsModel;
-    this.#offersModel = offersModel;
-    this.#destinationsModel = destinationsModel;
     this.#filterModel = filterModel;
 
     this.#pointNewPresenter = new PointNewPresenter(this.#routeComponent.element, this.#handleViewAction);
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+
   }
 
   get points() {
@@ -59,16 +57,22 @@ export default class RoutePresenter {
     return filteredPoints;
   }
 
+  get offers() {
+    return this.#pointsModel.offers;
+  }
+
+  get destinations() {
+    return this.#pointsModel.destinations;
+  }
+
   init = () => {
-    this.#routeOffers = getAllOffersWithType([...this.#offersModel.offersByType], [...this.#offersModel.allOffers]);
-    this.#allDestinations = [...this.#destinationsModel.destinations];
     this.#renderRoute();
   };
 
   createPoint = (callback) => {
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#pointNewPresenter.init(callback, this.#allDestinations, this.#routeOffers);
+    this.#pointNewPresenter.init(callback, this.destinations, this.offers);
   };
 
   #handleModeChange = () => {
@@ -93,15 +97,25 @@ export default class RoutePresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#pointPresenter.get(data.id).init(data, this.#allDestinations, this.#routeOffers);
+        this.#pointPresenter.get(data.id).init(data, this.destinations, this.offers);
         break;
       case UpdateType.MINOR:
-        this.#clearPointList();
-        this.#renderPointList();
+        this.#clearRoute();
+        this.#renderRoute();
         break;
       case UpdateType.MAJOR:
-        this.#clearRoute({resetSortType: true});
+        this.#clearRoute({resetSortType: false});
         this.#renderRoute();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderRoute();
+        break;
+      case UpdateType.ERROR:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderErrLoading();
         break;
     }
   };
@@ -112,8 +126,8 @@ export default class RoutePresenter {
       return;
     }
     this.#currentSortType = sortType;
-    this.#clearPointList();
-    this.#renderPointList();
+    this.#clearRoute();
+    this.#renderRoute();
   };
 
   #renderSort = () => {
@@ -132,25 +146,13 @@ export default class RoutePresenter {
     points.forEach((point) => this.#renderPoint(point, allDestinations, allOffers));
   };
 
-  #clearPointList = () => {
-    this.#pointPresenter.forEach((presenter) => presenter.destroy());
-    this.#pointPresenter.clear();
-  };
-
-  #renderPointList = () => {
-    const pointCount = this.points.length;
-    const points = this.points.slice(0, pointCount);
-
-    render(this.#routeComponent, this.#routeContainer);
-    this.#renderPoints(points, this.#allDestinations, this.#routeOffers);
-  };
-
   #renderMsgEmpty = () => {
     this.#noPointComponent = new EmptyView(this.#filterType);
     render(this.#noPointComponent, this.#routeComponent.element, RenderPosition.AFTERBEGIN);
   };
 
   #clearRoute = ({resetSortType = false} = {}) => {
+    this.#pointNewPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
     this.#pointPresenter.clear();
 
@@ -163,16 +165,31 @@ export default class RoutePresenter {
     }
   };
 
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#routeComponent.element, RenderPosition.AFTERBEGIN);
+  };
+
+  #renderErrLoading = () => {
+    render(this.#errLoadingComponent, this.#routeComponent.element, RenderPosition.AFTERBEGIN);
+  };
+
   #renderRoute = () => {
+    render(this.#routeComponent, this.#routeContainer);
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
     const points = this.points;
     const pointCount = points.length;
+    const offers = this.offers;
+    const destinations = this.destinations;
 
-    render(this.#routeComponent, this.#routeContainer);
     if (pointCount === 0) {
       this.#renderMsgEmpty();
       return;
     }
     this.#renderSort();
-    this.#renderPoints(points.slice(0, pointCount), this.#allDestinations, this.#routeOffers);
+    this.#renderPoints(points.slice(0, pointCount), destinations, offers);
   };
 }

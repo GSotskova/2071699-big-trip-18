@@ -20,8 +20,8 @@ export const getdateDiff = (date1, date2) => {
 
 
 export const sortDuration = (point1,point2) => {
-  const duration1 = point1.dateTo.diff(point1.dateFrom);
-  const duration2 = point2.dateTo.diff(point2.dateFrom);
+  const duration1 = dayjs(point1.dateTo).diff(dayjs(point1.dateFrom));
+  const duration2 = dayjs(point2.dateTo).diff(dayjs(point2.dateFrom));
   return duration2 - duration1;
 };
 

@@ -1,15 +1,5 @@
 import dayjs from 'dayjs';
 
-export const DESCRIPTIONS = ['Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-  'Cras aliquet varius magna, non porta ligula feugiat eget.',
-  'Fusce tristique felis at fermentum pharetra.',
-  'Aliquam id orci ut lectus varius viverra.',
-  'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
-  'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.'];
-
-export const TYPES = ['Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
-export const CITIES = [ 'Mexico', 'Bern', 'Prague', 'Ottawa', 'Paris', 'Moscow','London','Athens','New York','Istanbul'];
-
 export const SortType = {
   DEFAULT: 'Day',
   DATE_EVENT: 'Event',
@@ -17,9 +7,6 @@ export const SortType = {
   DATE_PRICE: 'Price',
   DATE_OFFERS: 'Offers',
 };
-
-export const POINT_COUNT = 9;
-
 
 export const pointEmpty = {
   price: '',
@@ -32,7 +19,6 @@ export const pointEmpty = {
   type: 'Flight',
 };
 
-export const COUNT_OFFERS_TYPE = 5;
 
 export const UserAction = {
   UPDATE_POINT: 'UPDATE_POINT',
@@ -44,6 +30,8 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
+  ERROR: 'ERROR'
 };
 
 export const FilterType = {

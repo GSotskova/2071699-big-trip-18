@@ -2,7 +2,7 @@ import {render, replace, remove} from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
 import PointView from '../view/point-view.js';
 import {UserAction, UpdateType} from '../constants.js';
-import {isDatesEqual} from '../utils/point.js';
+import {isDatesEqual, isPriceEqual} from '../utils/point.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -61,10 +61,8 @@ export default class PointPresenter {
     if (this.#mode === Mode.EDITING) {
       replace(this.#pointEditComponent, prevPointEditComponent);
     }
-
     remove(prevPointComponent);
     remove(prevPointEditComponent);
-
   };
 
   destroy = () => {
@@ -118,7 +116,8 @@ export default class PointPresenter {
   #handleFormSubmit = (update) => {
     const isMajorUpdate =
         !isDatesEqual(this.#point.dateFrom, update.dateFrom) ||
-        !isDatesEqual(this.#point.dateTo, update.dateTo);
+        !isDatesEqual(this.#point.dateTo, update.dateTo) ||
+        !isPriceEqual(this.#point.price, update.price) ;
     this.#changeData(
       UserAction.UPDATE_POINT,
       isMajorUpdate ? UpdateType.MAJOR : UpdateType.PATCH,
