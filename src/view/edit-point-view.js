@@ -32,8 +32,7 @@ const createPhotoTemplate = (photos) => {
     photosImgTemplate += `<img class="event__photo" src="${el.src}" alt="Event photo"></img>`;
   });
   return photosImgTemplate;
-
-
+};
 
 const createDestinationTemplate = (description, photoDestination) => (
   `<section class="event__section  event__section--destination">
