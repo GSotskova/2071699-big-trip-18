@@ -4,8 +4,6 @@ import {UpdateType} from '../constants.js';
 export default class PointsModel extends Observable {
   #pointsApiService = null;
   #points = [];
-  #offers = [];
-  #destinations = [];
 
   constructor(pointsApiService) {
     super();
@@ -16,33 +14,17 @@ export default class PointsModel extends Observable {
     return this.#points;
   }
 
-  get offers() {
-    return this.#offers;
-  }
-
-  get destinations() {
-    return this.#destinations;
-  }
 
   init = async () => {
     try {
       const points = await this.#pointsApiService.points;
       this.#points = points.map(this.#adaptToClient);
-
-      const offers = await this.#pointsApiService.offers;
-      this.#offers = offers.map((offer) => offer);
-
-      const destinations = await this.#pointsApiService.destinations;
-      this.#destinations = destinations.map((destination) => destination);
-
     } catch(err) {
       this.#points = [];
-      this.#offers = [];
-      this.#destinations = [];
       throw new Error('Can\'t load data');
     } finally {
 
-      if(this.#points.length === 0 || this.#offers.length === 0 || this.#destinations.length === 0) {
+      if (this.#points.length === 0) {
         this._notify(UpdateType.ERROR);
       }
     }

@@ -1,18 +1,35 @@
 import Observable from '../framework/observable.js';
-import {generateOffer, generateOffersByType} from '../mock/point.js';
-import {TYPES, COUNT_OFFERS_TYPE} from '../constants.js';
+import {UpdateType} from '../constants.js';
 
 
 export default class OffersModel extends Observable {
-  #allOffers = Array.from({length: TYPES.length * COUNT_OFFERS_TYPE}, (_v,i) => generateOffer(i + 1));
-  #offersByType = Array.from({length: TYPES.length}, (_v,i) => generateOffersByType(i + 1));
+  #offersApiService = null;
+  #offers = [];
 
-  get allOffers() {
-    return this.#allOffers;
+  constructor(offersApiService) {
+    super();
+    this.#offersApiService = offersApiService;
   }
 
-  get offersByType() {
-    return this.#offersByType;
+  init = async () => {
+    try {
+      const offers = await this.#offersApiService.offers;
+      this.#offers = offers.map((offer) => offer);
+    } catch(err) {
+      this.#offers = [];
+      throw new Error('Can\'t load data');
+    } finally {
+
+      if (this.#offers.length === 0) {
+        this._notify(UpdateType.ERROR);
+      }
+    }
+
+    this._notify(UpdateType.INIT);
+  };
+
+  get offers () {
+    return this.#offers;
   }
 
 }

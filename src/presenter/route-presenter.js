@@ -13,6 +13,8 @@ import {SortType, UpdateType, UserAction, FilterType} from '../constants.js';
 export default class RoutePresenter {
   #routeContainer = null;
   #pointsModel = null;
+  #destinationsModel = null;
+  #offersModel = null;
   #filterModel = null;
 
   #routeComponent = new RouteView();
@@ -29,9 +31,11 @@ export default class RoutePresenter {
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
 
-  constructor(routeContainer, pointsModel, filterModel) {
+  constructor(routeContainer, pointsModel, destinationsModel, offersModel, filterModel) {
     this.#routeContainer = routeContainer;
     this.#pointsModel = pointsModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
     this.#filterModel = filterModel;
 
     this.#pointNewPresenter = new PointNewPresenter(this.#routeComponent.element, this.#handleViewAction);
@@ -58,11 +62,13 @@ export default class RoutePresenter {
   }
 
   get offers() {
-    return this.#pointsModel.offers;
+    const offers = this.#offersModel.offers;
+    return offers;
   }
 
   get destinations() {
-    return this.#pointsModel.destinations;
+    const destinations = this.#destinationsModel.destinations;
+    return destinations;
   }
 
   init = () => {
@@ -70,9 +76,11 @@ export default class RoutePresenter {
   };
 
   createPoint = (callback) => {
+    const offers = this.offers;
+    const destinations = this.destinations;
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#pointNewPresenter.init(callback, this.destinations, this.offers);
+    this.#pointNewPresenter.init(callback, destinations, offers);
   };
 
   #handleModeChange = () => {
@@ -95,9 +103,11 @@ export default class RoutePresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
+    const offers = this.offers;
+    const destinations = this.destinations;
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#pointPresenter.get(data.id).init(data, this.destinations, this.offers);
+        this.#pointPresenter.get(data.id).init(data, destinations, offers);
         break;
       case UpdateType.MINOR:
         this.#clearRoute();
@@ -136,14 +146,14 @@ export default class RoutePresenter {
     render(this.#sortComponent, this.#routeContainer, RenderPosition.AFTERBEGIN);
   };
 
-  #renderPoint = (point, allDestinations, allOffers) => {
+  #renderPoint = (point, destinations, offers) => {
     const pointPresenter = new PointPresenter(this.#routeComponent.element, this.#handleViewAction, this.#handleModeChange);
-    pointPresenter.init(point, allDestinations, allOffers);
+    pointPresenter.init(point, destinations, offers);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 
-  #renderPoints = (points, allDestinations, allOffers) => {
-    points.forEach((point) => this.#renderPoint(point, allDestinations, allOffers));
+  #renderPoints = (points, destinations, offers) => {
+    points.forEach((point) => this.#renderPoint(point, destinations, offers));
   };
 
   #renderMsgEmpty = () => {
@@ -182,14 +192,15 @@ export default class RoutePresenter {
     }
     const points = this.points;
     const pointCount = points.length;
-    const offers = this.offers;
-    const destinations = this.destinations;
 
     if (pointCount === 0) {
       this.#renderMsgEmpty();
       return;
     }
+
     this.#renderSort();
+    const offers = this.offers;
+    const destinations = this.destinations;
     this.#renderPoints(points.slice(0, pointCount), destinations, offers);
   };
 }
