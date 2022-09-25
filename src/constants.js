@@ -39,3 +39,6 @@ export const FilterType = {
   FUTURE: 'Future',
   PAST: 'Past',
 };
+
+export const AUTHORIZATION = 'Basic fdhgke7t6fhvdgkt645';
+export const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';

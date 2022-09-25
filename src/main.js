@@ -7,10 +7,8 @@ import RoutePresenter from './presenter/route-presenter.js';
 import OffersApiService from './api-services/offers-api-service.js';
 import DestinationsApiService from './api-services/destinations-api-service.js';
 import PointsApiService from './api-services/points-api-service.js';
+import {END_POINT, AUTHORIZATION} from './constants.js';
 
-
-const AUTHORIZATION = 'Basic fdhgke7t6fhvdgkt645';
-const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';
 const siteHeaderElement = document.querySelector('.page-header');
 const siteTripFiltersElement = siteHeaderElement.querySelector('.trip-controls__filters');
 
@@ -39,7 +37,13 @@ const handleNewPointButtonClick = () => {
 addPointButtonElement.addEventListener('click', handleNewPointButtonClick);
 
 filterPresenter.init();
-offersModel.init();
-destinationsModel.init();
-pointsModel.init();
+
+const runInit = async () => {
+  await offersModel.init();
+  await destinationsModel.init();
+  await pointsModel.init();
+};
+
+runInit();
+
 routePresenter.init();

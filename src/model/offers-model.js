@@ -13,8 +13,7 @@ export default class OffersModel extends Observable {
 
   init = async () => {
     try {
-      const offers = await this.#offersApiService.offers;
-      this.#offers = offers.map((offer) => offer);
+      this.#offers = await this.#offersApiService.offers;
     } catch(err) {
       this.#offers = [];
       throw new Error('Can\'t load data');
