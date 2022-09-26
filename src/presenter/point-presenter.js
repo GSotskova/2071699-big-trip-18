@@ -156,7 +156,7 @@ export default class PointPresenter {
         !isPriceEqual(this.#point.price, update.price) ;
     this.#changeData(
       UserAction.UPDATE_POINT,
-      isMajorUpdate ? UpdateType.MAJOR : UpdateType.PATCH,
+      isMajorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
   };

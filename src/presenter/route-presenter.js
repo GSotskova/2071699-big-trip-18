@@ -136,7 +136,7 @@ export default class RoutePresenter {
         this.#renderRoute();
         break;
       case UpdateType.MAJOR:
-        this.#clearRoute({resetSortType: false});
+        this.#clearRoute({resetSortType: true});
         this.#renderRoute();
         break;
       case UpdateType.INIT:
