@@ -9,32 +9,12 @@ export const getDestinationIdByName = (name, destinations) => destinations.find(
 //получаем список наименований всех точек назначения
 export const getDestinationsNamesList = (destinations) => destinations.map((el) => el.name);
 
-//getAllOfferType - Получаем "склеенный" массив объектов OffersByType и Offers (записываем в totalOffers)
-const getOffersByCurrentType = (currentOffer, allOffers, addedOffers) => {
-  let objNew = {};
-  const offersByCurrentType = [];
-  currentOffer.offers.forEach((el) => {
-    objNew = allOffers.find((offer) => el === offer.id);
-    objNew['type'] = currentOffer.type;
-    if (!addedOffers.includes(objNew)) {
-      offersByCurrentType.push(objNew);
-    }
-  });
-  return offersByCurrentType;
-};
-
-export const getAllOffersWithType = (offersByType, allOffers) => {
-  let totalOffers = [];
-  offersByType.forEach((el) => {
-    if (el.offers.length !== 0) {
-      totalOffers = [...totalOffers,...getOffersByCurrentType(el, allOffers, totalOffers)];
-    }
-  });
-  return totalOffers;
-};
-
 //получаем массив объектов с опциями для конкретной точки маршрута
-export const getPointOffers = (pointOffersIds, allOffers) =>pointOffersIds.map((offerId) => allOffers.find((offer) => offer.id === offerId));
-
+export const getPointOffers = (pointOffersIds, pointType, allOffers) => {
+  const offersInType = allOffers.find((offer) => offer.type === pointType).offers;
+  return pointOffersIds.map((offerId) => offersInType.find((offer) => offer.id === offerId ));
+};
 
 export const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
+
+export const isPriceEqual = (priceA, priceB) => (priceA === null && priceB === null) || priceA === priceB;

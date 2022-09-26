@@ -6,7 +6,6 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const createOfferEditTemplate = (offer, selectedOffersIds) => {
-
   const {id, price, title} = offer;
   let isChecked = '';
   if (selectedOffersIds.includes(id)) {
@@ -27,19 +26,23 @@ const createOfferEditTemplate = (offer, selectedOffersIds) => {
 
 const createListDestinationsTmpl = (nameDestination) => `<option value="${nameDestination}"></option>`;
 
-const createPhotoTemplate = (photosrc) => (
-  `<div class="event__photos-container">
-     <div class="event__photos-tape">
-      <img class="event__photo" src="${photosrc}" alt="Event photo">
-     </div>
-   </div>`
-);
+const createPhotoTemplate = (photos) => {
+  let photosImgTemplate = '';
+  photos.forEach((el) => {
+    photosImgTemplate += `<img class="event__photo" src="${el.src}" alt="Event photo"></img>`;
+  });
+  return photosImgTemplate;
+};
 
 const createDestinationTemplate = (description, photoDestination) => (
   `<section class="event__section  event__section--destination">
    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
    <p class="event__destination-description">${description}</p>
-   ${photoDestination}
+   <div class="event__photos-container">
+     <div class="event__photos-tape">
+     ${photoDestination}
+     </div>
+   </div>
 </section>`
 );
 
@@ -59,16 +62,18 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
 
   let currentDestination = {};
   if (typeof newDestinationId === 'number' && newDestinationId > 0) {
-
     currentDestination = getDestinationById(newDestinationId, destinations);
-    photoDestination = createPhotoTemplate(currentDestination.pictures[0].src);
+    photoDestination = createPhotoTemplate(currentDestination.pictures);
     destinationElement = createDestinationTemplate(currentDestination.description, photoDestination);
   }
 
   if (newType) {
+
     allOffers.forEach((el) => {
       if (el.type.toLowerCase() === newType.toLowerCase()){
-        offerEditTemplate += createOfferEditTemplate(el, newSelectedOffersIds);
+        el.offers.forEach((offer) => {
+          offerEditTemplate += createOfferEditTemplate(offer, newSelectedOffersIds);
+        });
       }
     });
   }

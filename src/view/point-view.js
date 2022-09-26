@@ -26,7 +26,7 @@ const createPointTemplate = (point, destinations, allOffers) => {
 
   let offerTemplate = '';
 
-  const selectedOffers = getPointOffers(offers, allOffers);
+  const selectedOffers = getPointOffers(offers, type.toLowerCase(), allOffers);
   selectedOffers.forEach((el) => {
     offerTemplate += createOfferTemplate(el);
   });
