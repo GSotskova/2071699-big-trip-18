@@ -71,7 +71,7 @@ export default class PointsModel extends Observable {
   };
 
   #adaptToClient = (point) => {
-    const adaptedPoint = {...point,
+    const adaptedPoint = {
       price: point['base_price'],
       dateFrom: new Date(point['date_from']),
       dateTo: new Date(point['date_to']),
