@@ -5,7 +5,7 @@ import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
-const createOfferEditTemplate = (offer, selectedOffersIds) => {
+const createOfferEditTemplate = (offer, selectedOffersIds, isDisabled) => {
   const {id, price, title} = offer;
   let isChecked = '';
   if (selectedOffersIds.includes(id)) {
@@ -14,7 +14,14 @@ const createOfferEditTemplate = (offer, selectedOffersIds) => {
 
   return (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" name="event__offer" value="${title}" ${isChecked}>
+      <input
+        class="event__offer-checkbox visually-hidden"
+        id="${id}"
+        type="checkbox"
+        name="event__offer"
+        value="${title}"
+        ${isChecked} ${isDisabled ? 'disabled' : ''}
+      >
       <label class="event__offer-label" for="${id}">
       <span class="event__offer-title">${title}</span>
       &plus;&euro;&nbsp;
@@ -46,19 +53,49 @@ const createDestinationTemplate = (description, photoDestination) => (
 </section>`
 );
 
+const createResetButtonTemplate = (typeFormName, isDeleting, isDisabled) => {
+  let buttonText = '';
+  if (typeFormName === 'Edit' ) {
+    buttonText = isDeleting ? 'Deleting...' : 'Delete';
+  }
+  else {
+    buttonText = 'Cancel';
+  }
+
+  return `<button class="event__reset-btn" type="reset"  ${isDisabled ? 'disabled' : ''}>
+  ${buttonText}
+</button>`;
+};
 
 const createEditPointTemplate = (data, destinations, allOffers, typeFormName) => {
-  const {price, dateFrom, dateTo, newDestinationId, newSelectedOffersIds, newType} = data;
+  const {
+    price,
+    dateFrom,
+    dateTo,
+    newDestinationId,
+    newSelectedOffersIds,
+    newType,
+    isDisabled,
+    isSaving,
+    isDeleting,
+  } = data;
   const date1 = dayjs(dateFrom).format('DD/MM/YY HH:mm');
   const date2 = dayjs(dateTo).format('DD/MM/YY HH:mm');
   let offerEditTemplate = '';
   let photoDestination = '';
   let destinationsListTemplate = '';
   let destinationElement = '';
+  let resetButtomElement = '';
+  let patternDestinationsList = 'pattern = "';
+
   const destinationsNamesList = getDestinationsNamesList(destinations);
+
   destinationsNamesList.forEach((nameDestination) => {
     destinationsListTemplate += createListDestinationsTmpl(nameDestination);
+    patternDestinationsList += `${nameDestination }|`;
   });
+
+  patternDestinationsList += '"';
 
   let currentDestination = {};
   if (typeof newDestinationId === 'number' && newDestinationId > 0) {
@@ -72,12 +109,14 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
     allOffers.forEach((el) => {
       if (el.type.toLowerCase() === newType.toLowerCase()){
         el.offers.forEach((offer) => {
-          offerEditTemplate += createOfferEditTemplate(offer, newSelectedOffersIds);
+          offerEditTemplate += createOfferEditTemplate(offer, newSelectedOffersIds, isDisabled);
         });
       }
     });
   }
 
+
+  resetButtomElement = createResetButtonTemplate(typeFormName, isDeleting, isDisabled);
 
   return (
     `<li class="trip-events__item">
@@ -88,14 +127,21 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
              <span class="visually-hidden">Choose event type</span>
              <img class="event__type-icon" width="17" height="17" src="img/icons/${newType}.png" alt="Event type icon">
            </label>
-           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
            <div class="event__type-list">
              <fieldset class="event__type-group">
                <legend class="visually-hidden">Event type</legend>
 
                <div class="event__type-item">
-                 <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${newType === 'taxi' ? 'checked' : ''}>
+                 <input
+                   id="event-type-taxi-1"
+                   class="event__type-input  visually-hidden"
+                   type="radio"
+                   name="event-type"
+                   value="taxi"
+                   ${newType === 'taxi' ? 'checked' : ''}
+                 >
                  <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
                </div>
 
@@ -157,6 +203,9 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
              value="${currentDestination.name ? currentDestination.name : ''}"
              list="destination-list-1"
              autocomplete="off"
+             required
+             ${isDisabled ? 'disabled' : ''}
+             ${patternDestinationsList}
            >
            <datalist id="destination-list-1">
             ${destinationsListTemplate}
@@ -165,10 +214,25 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
 
          <div class="event__field-group  event__field-group--time">
            <label class="visually-hidden" for="event-start-time-1">From</label>
-           <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${date1}">
+           <input
+             class="event__input  event__input--time"
+             id="event-start-time-1"
+             type="text"
+             name="event-start-time"
+             value="${date1}"
+             ${isDisabled ? 'disabled' : ''}
+           >
            &mdash;
            <label class="visually-hidden" for="event-end-time-1">To</label>
-           <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${date2}">
+           <input
+             class="event__input
+             event__input--time"
+             id="event-end-time-1"
+             type="text"
+             name="event-end-time"
+             value="${date2}"
+             ${isDisabled ? 'disabled' : ''}
+           >
          </div>
 
          <div class="event__field-group  event__field-group--price">
@@ -176,16 +240,30 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
              <span class="visually-hidden">Price</span>
              &euro;
            </label>
-           <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}">
+           <input
+             class="event__input  event__input--price"
+             id="event-price-1"
+             type="number"
+             name="event-price"
+             value="${price}"
+             required
+             min="0"
+             step="1"
+             ${isDisabled ? 'disabled' : ''}
+           >
          </div>
 
-         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-         <button class="event__reset-btn" type="reset">
-           ${typeFormName === 'Edit' ? 'Delete' : 'Cancel'}
-         </button>
+         <button
+           class="event__save-btn  btn  btn--blue"
+           type="submit" ${/*isSubmitDisabled || */isDisabled ? 'disabled' : ''}
+          >
+          ${isSaving ? 'Saving...' : 'Save'}
+          </button>
+
+         ${resetButtomElement}
 
            ${typeFormName === 'Edit'
-      ? `<button class="event__rollup-btn   type="button">
+      ? `<button class="event__rollup-btn   type="button" ${isDisabled ? 'disabled' : ''}>
           <span class="visually-hidden">Open event</span>
          </button>`
       : ''}
@@ -288,7 +366,7 @@ export default class EditPointView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.#setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setClickResetHandler(this._callback.click);
+    this.setClickResetHandler(this._callback.delete);
     this.setClickRollUpHandler(this._callback.click);
   };
 
@@ -383,6 +461,9 @@ export default class EditPointView extends AbstractStatefulView {
     newDestinationId: point.destination,
     newType: point.type,
     newSelectedOffersIds: point.offers,
+    isDisabled: false,
+    isSaving: false,
+    isDeleting: false,
   });
 
   static parseStateToPointReset = (state) => {
@@ -397,6 +478,16 @@ export default class EditPointView extends AbstractStatefulView {
     if (point.newSelectedOffersIds) {
       delete point.newSelectedOffersIds;
     }
+    if (point.isDisabled) {
+      delete point.isDisabled;
+    }
+    if (point.isSaving) {
+      delete point.isSaving;
+    }
+    if (point.isDeleting) {
+      delete point.isDeleting;
+    }
+
     return point;
   };
 
@@ -404,7 +495,7 @@ export default class EditPointView extends AbstractStatefulView {
     const point = {
       ...state,
       destination: state.newDestinationId,
-      type: state.newType,
+      type: state.newType.toLowerCase(),
       offers: state.newSelectedOffersIds
     };
     EditPointView.parseStateToPointReset(state);
