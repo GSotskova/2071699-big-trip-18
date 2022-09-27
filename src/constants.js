@@ -42,3 +42,8 @@ export const FilterType = {
 
 export const AUTHORIZATION = 'Basic fdhgke7t6fhvdgkt645';
 export const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';
+
+export const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
