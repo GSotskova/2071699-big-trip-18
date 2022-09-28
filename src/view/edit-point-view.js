@@ -20,7 +20,8 @@ const createOfferEditTemplate = (offer, selectedOffersIds, isDisabled) => {
         type="checkbox"
         name="event__offer"
         value="${title}"
-        ${isChecked} ${isDisabled ? 'disabled' : ''}
+        ${isChecked}
+        ${isDisabled ? 'disabled' : ''}
       >
       <label class="event__offer-label" for="${id}">
       <span class="event__offer-title">${title}</span>
@@ -329,7 +330,8 @@ export default class EditPointView extends AbstractStatefulView {
 
   #dateFromChangeHandler = ([userDate]) => {
     this.updateElement({
-      dateFrom: userDate
+      dateFrom: userDate,
+      dateTo:  userDate > this._state.dateTo ? userDate : this._state.dateTo
     });
   };
 
