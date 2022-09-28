@@ -18,17 +18,16 @@ export default class PointsModel extends Observable {
   init = async () => {
     try {
       const points = await this.#pointsApiService.points;
-      this.#points = points.map(this.#adaptToClient);
+      if (points.length === 0) {
+        this.#points = [];
+      }
+      else {
+        this.#points = points.map(this.#adaptToClient);
+      }
     } catch(err) {
       this.#points = [];
       throw new Error('Can\'t load data');
-    } finally {
-
-      if (this.#points.length === 0) {
-        this._notify(UpdateType.ERROR);
-      }
     }
-
     this._notify(UpdateType.INIT);
   };
 
