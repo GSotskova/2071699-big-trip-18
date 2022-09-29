@@ -119,6 +119,8 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
 
   resetButtomElement = createResetButtonTemplate(typeFormName, isDeleting, isDisabled);
 
+  const offersByCurrentType = allOffers.find((offer) => offer.type === newType.toLowerCase()).offers;
+
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -256,7 +258,7 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
 
          <button
            class="event__save-btn  btn  btn--blue"
-           type="submit" ${/*isSubmitDisabled || */isDisabled ? 'disabled' : ''}
+           type="submit" ${isDisabled ? 'disabled' : ''}
           >
           ${isSaving ? 'Saving...' : 'Save'}
           </button>
@@ -271,14 +273,15 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
 
        </header>
        <section class="event__details">
-         <section class="event__section  event__section--offers">
+       ${offersByCurrentType.length !== 0 ?
+      `<section class="event__section  event__section--offers">
            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
            <div class="event__available-offers">
            ${offerEditTemplate}
            </div>
-         </section>
-
+         </section>`
+      : ''}
            ${destinationElement}
        </section>
      </form>
@@ -454,7 +457,12 @@ export default class EditPointView extends AbstractStatefulView {
   #setInnerHandlers = () => {
     this.element.querySelector('.event__input').addEventListener('change', this.#destinationInputHandler);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeOfferInputHandler);
-    this.element.querySelector('.event__available-offers').addEventListener('change', this.#offerCheckHandler);
+
+    const offersElement = this.element.querySelector('.event__available-offers');
+    if (offersElement) {
+      offersElement.addEventListener('change', this.#offerCheckHandler);
+    }
+
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceCheckHandler);
   };
 
