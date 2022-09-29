@@ -25,7 +25,7 @@ export const getPricePointOffers = (pointOffersIds, pointType, allOffers) => {
 };
 
 
-export const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
+export const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'm');
 
 export const isPriceEqual = (priceA, priceB) => (priceA === null && priceB === null) || priceA === priceB;
 
