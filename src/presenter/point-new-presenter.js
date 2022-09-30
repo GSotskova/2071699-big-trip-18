@@ -1,7 +1,7 @@
 import {render, RenderPosition, remove} from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
 import {UserAction, UpdateType} from '../constants.js';
-import {pointEmpty} from '../constants.js';
+import {POINT_EMPTY, FormMode} from '../constants.js';
 
 export default class PointNewPresenter {
   #pointListContainer = null;
@@ -10,7 +10,7 @@ export default class PointNewPresenter {
   #destinations = null;
   #allOffers = null;
   #changeData = null;
-  #typeFormName = 'New'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
+  #typeFormName = FormMode.NEW; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
 
   #destroyCallback = null;
 
@@ -27,7 +27,7 @@ export default class PointNewPresenter {
       return;
     }
 
-    this.#pointEditComponent = new EditPointView(pointEmpty, this.#destinations, this.#allOffers, this.#typeFormName);
+    this.#pointEditComponent = new EditPointView(POINT_EMPTY, this.#destinations, this.#allOffers, this.#typeFormName);
     this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointEditComponent.setClickResetHandler(this.#handleDeleteClick);
 

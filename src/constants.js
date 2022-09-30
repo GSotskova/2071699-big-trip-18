@@ -8,7 +8,7 @@ export const SortType = {
   DATE_OFFERS: 'Offers',
 };
 
-export const pointEmpty = {
+export const POINT_EMPTY = {
   price: '',
   dateFrom: dayjs(),
   dateTo:dayjs(),
@@ -38,6 +38,11 @@ export const FilterType = {
   EVERYTHING: 'Everything',
   FUTURE: 'Future',
   PAST: 'Past',
+};
+
+export const FormMode = {
+  NEW: 'New',
+  EDIT: 'Edit',
 };
 
 export const AUTHORIZATION = 'Basic fdhgke7t6fhvdgkt645';

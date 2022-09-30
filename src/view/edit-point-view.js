@@ -2,6 +2,7 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import dayjs from 'dayjs';
 import {getDestinationById, getDestinationsNamesList, getDestinationIdByName} from '../utils/point.js';
 import flatpickr from 'flatpickr';
+import {FormMode} from '../constants.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -56,7 +57,7 @@ const createDestinationTemplate = (description, photoDestination) => (
 
 const createResetButtonTemplate = (typeFormName, isDeleting, isDisabled) => {
   let buttonText = '';
-  if (typeFormName === 'Edit' ) {
+  if (typeFormName === FormMode.EDIT) {
     buttonText = isDeleting ? 'Deleting...' : 'Delete';
   }
   else {
@@ -265,7 +266,7 @@ const createEditPointTemplate = (data, destinations, allOffers, typeFormName) =>
 
          ${resetButtomElement}
 
-           ${typeFormName === 'Edit'
+           ${typeFormName === FormMode.EDIT
       ? `<button class="event__rollup-btn   type="button" ${isDisabled ? 'disabled' : ''}>
           <span class="visually-hidden">Open event</span>
          </button>`
@@ -398,7 +399,7 @@ export default class EditPointView extends AbstractStatefulView {
   };
 
   setClickRollUpHandler = (callback) => {
-    if (this.#typeFormName === 'New') {
+    if (this.#typeFormName === FormMode.NEW) {
       return;
     }
     this._callback.click = callback;

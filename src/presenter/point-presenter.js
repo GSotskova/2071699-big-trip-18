@@ -1,7 +1,7 @@
 import {render, replace, remove} from '../framework/render.js';
 import EditPointView from '../view/edit-point-view.js';
 import PointView from '../view/point-view.js';
-import {UserAction, UpdateType} from '../constants.js';
+import {UserAction, UpdateType, FormMode} from '../constants.js';
 import {isDatesEqual, isPriceEqual} from '../utils/point.js';
 
 const Mode = {
@@ -23,7 +23,7 @@ export default class PointPresenter {
   #changeMode = null;
 
   #mode = Mode.DEFAULT;
-  #typeFormName = 'Edit'; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
+  #typeFormName = FormMode.EDIT; //т.к.используется одна View  для новой точки маршрута и для формы редактирования добавляем признак для формы "New"/"Edit"
 
   constructor(PointListContainer, changeData, changeMode) {
     this.#PointListContainer = PointListContainer;
